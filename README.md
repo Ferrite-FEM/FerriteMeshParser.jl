@@ -5,6 +5,7 @@
 [![Build Status](https://github.com/KnutAM/FerriteMeshParser.jl/actions/workflows/CI.yml/badge.svg?branch=main)](https://github.com/KnutAM/FerriteMeshParser.jl/actions/workflows/CI.yml?query=branch%3Amain)
 [![Coverage](https://codecov.io/gh/KnutAM/FerriteMeshParser.jl/branch/main/graph/badge.svg)](https://codecov.io/gh/KnutAM/FerriteMeshParser.jl)
 
+**Note:** This package is currently only work in progress and there are likely many bugs. Frequent interface changes might also occur. 
 
 **Goals**
 
