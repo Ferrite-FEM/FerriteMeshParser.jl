@@ -5,17 +5,18 @@
 [![Build Status](https://github.com/KnutAM/FerriteMeshParser.jl/actions/workflows/CI.yml/badge.svg?branch=main)](https://github.com/KnutAM/FerriteMeshParser.jl/actions/workflows/CI.yml?query=branch%3Amain)
 [![Coverage](https://codecov.io/gh/KnutAM/FerriteMeshParser.jl/branch/main/graph/badge.svg)](https://codecov.io/gh/KnutAM/FerriteMeshParser.jl)
 
-## Parser for mesh into Ferrite
-Goals
+
+**Goals**
 
 * Contain the common elements for 2d and 3d from Abaqus
 * Provide interface for a user to extend to non-supported Abaqus element types
 * Provide interface for a user to override default behavior if desired
 
+## Getting started
 ### Basic usage
-
+Let `filename` be the path to your Abaqus input file and do
 ```julia
-grid = get_ferrite_grid(filename; input_format="auto", user_elements::Dict{String,DataType}=Dict{String,DataType}())
+grid = get_ferrite_grid(filename)
 ```
 
 ### Custom cells
@@ -35,6 +36,11 @@ The full interface allows specifying the type of input if it is not possible to 
 grid = get_ferrite_grid(filename; input_format=FerriteMeshParser.AutomaticMeshFormat(), user_elements::Dict{String,DataType}=Dict{String,DataType}())
 ```
 
+## Current limitations
+* Only one part or instance can exist in the input file
+* All node and element numbers must start at 1 and not have any gaps (e.g if there are 10 nodes, no node number higher than 10 can be given)
+
+
 ## Todos
 * Give error if more than one part or instance is given (not currently supported)
 * Improve creation of cells - should not hard-code the Ferrite.AbstractCell type of the array
@@ -46,7 +52,9 @@ grid = get_ferrite_grid(filename; input_format=FerriteMeshParser.AutomaticMeshFo
 
 
 # Credits
-This module is built upon scripts provided by (in alphabetical order)
+This module is built upon scripts kindly provided by (in alphabetical order)
 
-* @kimauth
-* @KristofferC
+* [@kimauth](github.com/kimauth)
+* [@kristofferC](github.com/kristofferC)
+
+but all bugs belong to [@KnutAM](github.com/KnutAM)
