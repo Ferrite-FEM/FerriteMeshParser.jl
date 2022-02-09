@@ -4,6 +4,15 @@ import Literate
 EXAMPLEDIR = joinpath(@__DIR__, "src", "literate")
 GENERATEDDIR = joinpath(@__DIR__, "src", "examples")
 mkpath(GENERATEDDIR)
+
+# Copy supplementary files first
+suplementary_fileextensions = [".inp", ".svg", ".png", ".jpg", ".gif"]
+for example in readdir(EXAMPLEDIR)
+    if any(endswith.(example, suplementary_fileextensions))
+        cp(joinpath(EXAMPLEDIR, example), joinpath(GENERATEDDIR, example); force=true)
+    end
+end
+
 for example in readdir(EXAMPLEDIR)
     if endswith(example, ".jl")
         input = abspath(joinpath(EXAMPLEDIR, example))
@@ -17,10 +26,10 @@ for example in readdir(EXAMPLEDIR)
         mdpost(str) = replace(str, "@__CODE__" => code_clean)
         Literate.markdown(input, GENERATEDDIR, postprocess = mdpost)
         Literate.notebook(input, GENERATEDDIR, execute = is_ci) # Don't execute locally
-    elseif any(endswith.(example, [".inp", ".svg", ".png", ".jpg", ".gif"]))
-        cp(joinpath(EXAMPLEDIR, example), joinpath(GENERATEDDIR, example); force=true)
     else
-        @warn "ignoring $example"
+        if !any(endswith.(example, suplementary_fileextensions))
+            @warn "ignoring $example"
+        end
     end
 end
 
