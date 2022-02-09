@@ -47,3 +47,9 @@ Ferrite.faces(c::SerendipityQuadrilateral) = ((c.nodes[1],c.nodes[2]), (c.nodes[
         end
     end
 end
+
+@testset "facesetgeneration" begin
+    filename = joinpath(@__DIR__, "test_files", "compact_tension.inp")
+    grid = get_ferrite_grid(filename)
+    @test create_faceset(grid, getnodeset(grid, "Hole")) == create_faceset(grid, getnodeset(grid, "Hole"), getcellset(grid, "Hole"))    # Test that including cells doesn't change the created sets
+end
