@@ -4,4 +4,5 @@
 *.vscode
 /Manifest.toml
 /docs/build/
+docs/src/examples/
 reference_scripts

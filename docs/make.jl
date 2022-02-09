@@ -5,7 +5,8 @@ const is_ci = get(ENV, "CI", "false") == "true"
 
 include("generate.jl")
 GENERATEDEXAMPLES = [joinpath("examples", f) for f in (
-    "compact_tension.md",)]
+    "compact_tension.md",
+    "user_element.md")]
 
 DocMeta.setdocmeta!(FerriteMeshParser, :DocTestSetup, :(using FerriteMeshParser); recursive=true)
 

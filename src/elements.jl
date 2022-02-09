@@ -19,4 +19,4 @@ function get_element_type_dict(::AbaqusMeshFormat)
 end
 
 # Default creator for Ferrite cell types from Abaqus elements
-create_cell(::Type{CellType}, node_numbers, ::AbaqusMeshFormat) where{CellType<:Ferrite.Cell} = CellType(ntuple(j->node_numbers[j], length(node_numbers)))
+create_cell(::Type{CellType}, node_numbers, ::AbaqusMeshFormat) where{CellType<:Ferrite.AbstractCell} = CellType(ntuple(j->node_numbers[j], length(node_numbers)))
