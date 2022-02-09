@@ -1,9 +1,6 @@
-@warn pwd()
-@warn join(readdir(pwd()), ", ")
-
 using Ferrite, FerriteMeshParser
 
-grid = get_ferrite_grid(joinpath(@__DIR__, "compact_tension.inp"))
+grid = get_ferrite_grid("compact_tension.inp")
 
 println(typeof(grid))
 println(unique(typeof.(getcells(grid))))    # The different cell types in the grid
