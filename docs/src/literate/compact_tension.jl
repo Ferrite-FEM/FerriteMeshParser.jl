@@ -22,7 +22,7 @@ println(pwd())
 #
 using Ferrite, FerriteMeshParser
 
-grid = get_ferrite_grid("compact_tension.inp")
+grid = get_ferrite_grid(joinpath(@__DIR__, "compact_tension.inp"))
 
 # We can now inspect this grid, showing that we have different cell types
 println(typeof(grid))

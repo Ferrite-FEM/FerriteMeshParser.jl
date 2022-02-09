@@ -4,6 +4,11 @@
 # 
 # ![](wedge_element.svg)
 # 
+#
+# Print working directory
+
+println(pwd())
+
 # For this element, it can be defined as a specific `Ferrite.Cell` type
 using Ferrite, FerriteMeshParser
 LinearWedge = Ferrite.Cell{3,6,5}
@@ -21,7 +26,7 @@ create_cell(::Type{LinearWedge}, node_numbers, ::FerriteMeshParser.AbaqusMeshFor
 # rather a subtype of `Ferrite.AbstractCell`. After these modifications, one can import 
 # the mesh by specifying that the Abaqus code `C3D6` should be interpreted as a `LinearWedge`:
 
-grid = get_ferrite_grid("wedge_element.inp"; user_elements=Dict("C3D6"=>LinearWedge));
+grid = get_ferrite_grid(joinpath(@__DIR__, "wedge_element.inp"); user_elements=Dict("C3D6"=>LinearWedge));
 
 # Giving the following grid
 println(typeof(grid))
