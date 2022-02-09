@@ -15,6 +15,10 @@
 # ## Importing mesh
 # The mesh above was created in Abaqus cae, and in this example we 
 # import the generated input file: [compact_tension.inp](compact_tension.inp)
+# Print working directory
+
+println(pwd())
+
 #
 using Ferrite, FerriteMeshParser
 
