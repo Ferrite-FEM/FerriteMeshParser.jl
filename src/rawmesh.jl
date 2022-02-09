@@ -20,7 +20,7 @@ end
 RawNodes(;numbers, coordinates) = RawNodes(numbers, coordinates) 
 
 getnodenums(nodes::RawNodes) = nodes.numbers
-getcoordinates(nodes::RawNodes) = nodes.coordinates
+Ferrite.getcoordinates(nodes::RawNodes) = nodes.coordinates
 
 getnumnodes(nodes::RawNodes) = length(getnodenums(nodes))
 getdim(nodes::RawNodes) = size(getcoordinates(nodes),1)
@@ -35,9 +35,9 @@ struct RawMesh
 end
 RawMesh(;elements,nodes,elementsets,nodesets) = RawMesh(elements,nodes,elementsets,nodesets)
 
-getnodes(mesh::RawMesh) = mesh.nodes
+Ferrite.getnodes(mesh::RawMesh) = mesh.nodes
 getelementsdicts(mesh::RawMesh) = mesh.elementsdicts
-getnodesets(mesh::RawMesh) = mesh.nodesets
+Ferrite.getnodesets(mesh::RawMesh) = mesh.nodesets
 getelementsets(mesh::RawMesh) = mesh.elementsets
 
 getdim(mesh::RawMesh) = getdim(getnodes(mesh))

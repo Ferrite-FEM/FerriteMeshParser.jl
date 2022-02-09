@@ -9,7 +9,7 @@ function get_element_type_dict(::AbaqusMeshFormat)
     tetra = (Cell{3,4,4}, ("C3D4",))
     tetra2 = (Cell{3,10,4}, ("C3D10",))
     hexa = (Cell{3,8,6}, ("C3D8","C3D8R"))
-    hexa2 = (Cell{3,20,6}, ("C3D20",))
+    hexa2 = (Cell{3,20,6}, ("C3D20","C3D20R"))
 
     dict = Dict{String,DataType}()
     for types in (quad, tria, quad2, tria2, tetra, tetra2, hexa, hexa2)

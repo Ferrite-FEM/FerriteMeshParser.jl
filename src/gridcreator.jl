@@ -55,3 +55,16 @@ end
 function create_nodesets(rawnodesets)
     return Dict(key => Set(nums) for (key, nums) in rawnodesets)
 end
+
+
+"""
+    function generate_facesets!(grid::Ferrite.Grid)
+
+Based on all nodesets in `grid`, generate facesets for those sets.
+"""
+function generate_facesets!(grid::Ferrite.Grid)
+    cellset_or_nothing = Dict(key => (haskey(getcellsets(grid), key) ? getcellsets(grid)[key] : nothing) 
+                                for (key, set) in getnodesets(grid))
+    merge!(getfacesets(grid), Dict(key => create_faceset(grid, set, cellset_or_nothing[key])
+                                for (key, set) in getnodesets(grid)))
+end
