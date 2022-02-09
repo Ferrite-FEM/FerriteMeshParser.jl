@@ -7,7 +7,8 @@
 #
 # Print working directory
 
-println(pwd())
+@warn pwd()
+@warn join(readdir(pwd()), ", ")
 
 # For this element, it can be defined as a specific `Ferrite.Cell` type
 using Ferrite, FerriteMeshParser

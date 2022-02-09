@@ -17,7 +17,8 @@
 # import the generated input file: [compact_tension.inp](compact_tension.inp)
 # Print working directory
 
-println(pwd())
+@warn pwd()
+@warn join(readdir(pwd()), ", ")
 
 #
 using Ferrite, FerriteMeshParser
