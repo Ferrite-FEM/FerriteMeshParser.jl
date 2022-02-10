@@ -10,7 +10,7 @@ end
 function create_nodes(rawnodes::RawNodes, ::Val{dim}) where{dim}
     num = getnumnodes(rawnodes)
     nodes=Array{Node{dim, Float64}}(undef, num)
-    for node_number in getnodenums(rawnodes)
+    for node_number in getnumbers(rawnodes)
         x=Vec{dim}(getcoordinate(rawnodes, node_number))
         nodes[node_number] = Node(x)
     end

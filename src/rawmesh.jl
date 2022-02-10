@@ -19,10 +19,10 @@ struct RawNodes
 end
 RawNodes(;numbers, coordinates) = RawNodes(numbers, coordinates) 
 
-getnodenums(nodes::RawNodes) = nodes.numbers
+getnumbers(nodes::RawNodes) = nodes.numbers
 Ferrite.getcoordinates(nodes::RawNodes) = nodes.coordinates
 
-getnumnodes(nodes::RawNodes) = length(getnodenums(nodes))
+getnumnodes(nodes::RawNodes) = length(getnumbers(nodes))
 getdim(nodes::RawNodes) = size(getcoordinates(nodes),1)
 getcoordinate(nodes::RawNodes, number) = getcoordinates(nodes)[:,number]
 
@@ -41,3 +41,23 @@ Ferrite.getnodesets(mesh::RawMesh) = mesh.nodesets
 getelementsets(mesh::RawMesh) = mesh.elementsets
 
 getdim(mesh::RawMesh) = getdim(getnodes(mesh))
+getnumelements(mesh::RawMesh) = sum(getnumelements.(values(getelementsdicts(mesh))))
+
+
+# Verify that mesh is ok according to what is supported
+function checkmesh(mesh::RawMesh)
+    # Check that no node numbers are missing
+    nodes = getnodes(mesh)
+    minimum(getnumbers(nodes)) == 1 || throw(InvalidFileContent("Node numbering must start with 1"))
+    maximum(getnumbers(nodes)) == getnumnodes(nodes) || throw(InvalidFileContent("No node numbers may be skipped"))
+    # Check that no element numbers are missing
+    eldicts = getelementsdicts(mesh)
+    minelnum = 2
+    maxelnum = 0
+    for (_, elems) in eldicts
+        minelnum = min(minelnum, minimum(getnumbers(elems)))
+        maxelnum = max(maxelnum, maximum(getnumbers(elems)))
+    end
+    minelnum == 1 || throw(InvalidFileContent("Element numbering must start with 1"))
+    maxelnum == getnumelements(mesh) || throw(InvalidFileContent("No element numbers may be skipped"))
+end

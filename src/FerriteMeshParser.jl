@@ -45,6 +45,7 @@ include("gridcreator.jl")
 function get_ferrite_grid(filename; meshformat=AutomaticMeshFormat(), user_elements::Dict{String,DataType}=Dict{String,DataType}(), generate_facesets::Bool=true)
     detected_format = detect_mesh_format(filename, meshformat)
     mesh = read_mesh(filename, detected_format)
+    checkmesh(mesh)
     grid = create_grid(mesh, detected_format, user_elements)
     generate_facesets && generate_facesets!(grid)
     return grid
