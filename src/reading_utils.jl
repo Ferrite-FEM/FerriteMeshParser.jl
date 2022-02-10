@@ -1,11 +1,11 @@
 # Returns the next line without advancing in the buffer
-function peek_line(f)
-    mark(f)
-    line = strip(readline(f))
-    DEBUG_PARSE && println("Peeked: ", line)
-    reset(f)
-    return line
-end
+#function peek_line(f)
+#    mark(f)
+#    line = strip(readline(f))
+#    DEBUG_PARSE && println("Peeked: ", line)
+#    reset(f)
+#    return line
+#end
 
 # Returns the next line and advance in the buffer
 function eat_line(f)
