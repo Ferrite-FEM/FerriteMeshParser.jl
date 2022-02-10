@@ -65,3 +65,20 @@ end
     @test_throws FerriteMeshParser.UnsupportedElementType get_ferrite_grid(filename) 
 
 end
+
+@testset "ordering" begin
+    filename0 = joinpath(@__DIR__, "test_files", "2D_UnitArea_Linear.inp")
+    grid0 = get_ferrite_grid(filename0)
+
+    filename1 = joinpath(@__DIR__, "test_files", "2D_UnitArea_Linear_flipelementorder.inp")
+    grid1 = get_ferrite_grid(filename1)
+
+    filename2 = joinpath(@__DIR__, "test_files", "2D_UnitArea_Linear_perturbnodeorder.inp")
+    grid2 = get_ferrite_grid(filename2)
+
+    # comparing grid0==grid<i> doesn't work, so check each field:
+    for key in fieldnames(typeof(grid0))
+        @test getfield(grid0, key) == getfield(grid1, key)
+        @test getfield(grid0, key) == getfield(grid2, key)
+    end
+end
