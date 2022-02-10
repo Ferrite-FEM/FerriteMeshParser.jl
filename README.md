@@ -41,9 +41,6 @@ grid = get_ferrite_grid(filename; input_format=FerriteMeshParser.AutomaticMeshFo
 * Only one part or instance can exist in the input file
 * All node and element numbers must start at 1 and not have any gaps (e.g if there are 10 nodes, no node number higher than 10 can be given)
 
-## Todos
-* Give error if more than one part or instance is given (not currently supported)
-* Improve creation of cells - should not hard-code the Ferrite.AbstractCell type of the array
 
 ## Open challenges
 * Need to handle the case when node numbers are not consecutive, might be cases where some numbers are skipped.

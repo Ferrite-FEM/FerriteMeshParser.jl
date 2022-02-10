@@ -20,21 +20,18 @@ end
 function create_cells(rawelementsdict::Dict{String,RawElements}, user_elements::Dict, format)
     builtin_elements = get_element_type_dict(format)
     num_elements = sum(getnumelements.(values(rawelementsdict)))
-    cells = Array{Ferrite.AbstractCell}(undef, num_elements)
+    cells_generic = Array{Ferrite.AbstractCell}(undef, num_elements)
     for (key, rawelements) in rawelementsdict
         if haskey(user_elements, key)   # user_elements are prioritized over builtin
-            addcells!(cells, user_elements[key], rawelements, format)
+            addcells!(cells_generic, user_elements[key], rawelements, format)
         elseif haskey(builtin_elements, key)
-            addcells!(cells, builtin_elements[key], rawelements, format)
+            addcells!(cells_generic, builtin_elements[key], rawelements, format)
         else
             throw(UnsupportedElementType(key))
         end
     end
-    # Convert to array with same types if all types are the same
-    # Could perhaps be done already by using a function get_cell_type when creating cells...
-    if all(y->isa(y, typeof(first(cells))),cells)
-        cells = Array{typeof(first(cells))}([cell for cell in cells])
-    end
+    cell_type = promote_type(unique(typeof.(cells_generic))...)
+    cells = Array{cell_type}([cell for cell in cells_generic])  # Ensures that an as concrete type as possible returned. 
     return cells
 end
 
