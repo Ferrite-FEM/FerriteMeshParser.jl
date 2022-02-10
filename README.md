@@ -33,14 +33,14 @@ to return an instance of your subtype of `Ferrite.AbstractCell` with the given n
 
 
 ## Current limitations
-* Only one part or instance can exist in the input file
-* All node and element numbers must start at 1 and not have any gaps (e.g if there are 10 nodes, no node number higher than 10 can be given)
+* Only one part and one instance can exist in the input file
+* Node and element numbers must start at 1 and not have any gaps (e.g if there are 10 nodes, no node number higher than 10 can be given)
 
 
 # Credits
 This module is built upon scripts kindly provided by (in alphabetical order)
 
-* [@kimauth](github.com/kimauth)
-* [@kristofferC](github.com/kristofferC)
+* [@kimauth](http://github.com/kimauth)
+* [@kristofferC](http://github.com/kristofferC)
 
 but all bugs belong to [@KnutAM](github.com/KnutAM)
