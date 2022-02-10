@@ -84,6 +84,8 @@ function read_mesh(filename, ::AbaqusMeshFormat)
 
     nodesets = Dict{String, Vector{Int}}()
     elementsets = Dict{String, Vector{Int}}()
+    part_counter = 0
+    instance_counter = 0
 
     open(filename) do f
         while !eof(f)
@@ -91,30 +93,50 @@ function read_mesh(filename, ::AbaqusMeshFormat)
             if header == ""
                 continue
             end
+            DEBUG_PARSE && println("H: $header")
             if startswith(header, "*Node")
+                DEBUG_PARSE && println("Reading nodes")
                 read_dim = read_abaqus_nodes!(f, node_numbers, coord_vec)
                 dim == 0 && (dim = read_dim)  # Set dim if not yet set
                 read_dim != dim && throw(DimensionMismatch("Not allowed to mix nodes in different dimensions"))
             elseif startswith(header, "*Element")
                 if ((m = match(r"\*Element, type=(.*), ELSET=(.*)", header)) !== nothing)
+                    DEBUG_PARSE && println("Reading elements with elset")
                     read_abaqus_elements!(f, topology_vectors, element_number_vectors,  m.captures[1], m.captures[2], element_sets)
                 elseif ((m = match(r"\*Element, type=(.*)", header)) !== nothing)
+                    DEBUG_PARSE && println("Reading elements without elset")
                     read_abaqus_elements!(f, topology_vectors, element_number_vectors,  m.captures[1])
                 end
             elseif ((m = match(r"\*Elset, elset=(.*)", header)) !== nothing)
+                DEBUG_PARSE && println("Reading elementset")
                 read_abaqus_set!(f, elementsets, m.captures[1])
             elseif ((m = match(r"\*Nset, nset=(.*)", header)) !== nothing)
+                DEBUG_PARSE && println("Reading nodeset")
                 read_abaqus_set!(f, nodesets, m.captures[1])
-            # Ignore unused keywords
-            elseif isabaquskeyword(peek_line(f))
+            elseif startswith(header, "*Part")
+                DEBUG_PARSE && println("Increment part counter")
+                part_counter += 1
+            elseif startswith(header, "*Instance")
+                DEBUG_PARSE && println("Increment instance counter")
+                instance_counter += 1
+                discardlinesuntil(f, stopsign='*')  # Instances contain translations, or start with *Node if independent mesh
+            elseif isabaquskeyword(header)          # Ignore unused keywords
+                DEBUG_PARSE && println("Discarding keyword content")
                 discardlinesuntil(f, stopsign='*')
             else
                 if eof(f)
                     break
                 else
-                    error("Unknown header, \"$header\", in file = \"$filename\"")
+                    throw(InvalidFileContent("Unknown header, \"$header\", in file \"$filename\""))
                 end
             end
+        end
+
+        if part_counter > 1 || instance_counter > 1
+            msg = "Multiple parts or instances are not supported\n"
+            msg *= "Tip: If you want a single grid, merge parts and differentiated by Abaqus sets\n"
+            msg *= "     If you want multiple grids, split into multiple input files"
+            throw(InvalidFileContent(msg))
         end
     end
     

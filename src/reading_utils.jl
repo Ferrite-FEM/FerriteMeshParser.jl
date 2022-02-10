@@ -27,9 +27,9 @@ end
 # Read lines until a (stripped) line starts with stopsign. 
 # Sets the buffer to the start of the identified line
 function discardlinesuntil(io; stopsign)
-    readline(io) # Do not stop on the first line
     l = ""
-    while !startswith(strip(l), stopsign)
+    mark(io)
+    while !startswith(strip(l), stopsign) && !eof(io)
         mark(io)
         l = readline(io)
     end

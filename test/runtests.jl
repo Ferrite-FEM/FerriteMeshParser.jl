@@ -53,3 +53,15 @@ end
     grid = get_ferrite_grid(filename)
     @test create_faceset(grid, getnodeset(grid, "Hole")) == create_faceset(grid, getnodeset(grid, "Hole"), getcellset(grid, "Hole"))    # Test that including cells doesn't change the created sets
 end
+
+@testset "exceptions" begin
+    filename = joinpath(@__DIR__, "runtests.jl")
+    @test_throws FerriteMeshParser.UndetectableMeshFormatError get_ferrite_grid(filename) 
+
+    filename = joinpath(@__DIR__, "test_files", "twoinstances.inp")
+    @test_throws FerriteMeshParser.InvalidFileContent get_ferrite_grid(filename) 
+
+    filename = joinpath(@__DIR__, "test_files", "unsupported_element.inp")
+    @test_throws FerriteMeshParser.UnsupportedElementType get_ferrite_grid(filename) 
+
+end

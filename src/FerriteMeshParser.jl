@@ -18,6 +18,10 @@ struct UnsupportedElementType <: Exception
 end
 Base.showerror(io::IO, e::UnsupportedElementType) = println(io, "The element type \"$(e.elementtype)\" is not supported or given in user_elements")
 
+struct InvalidFileContent <: Exception
+    msg::String
+end
+Base.showerror(io::IO, e::InvalidFileContent) = println(io, e.msg)
 
 include("rawmesh.jl")
 include("elements.jl")
