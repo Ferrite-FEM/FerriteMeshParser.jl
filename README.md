@@ -14,17 +14,18 @@
 * Provide interface for a user to override default behavior if desired
 
 ## Getting started
+For more info and examples, please see the docs
 ### Basic usage
 Let `filename` be the path to your Abaqus input file and do
 ```julia
 grid = get_ferrite_grid(filename)
 ```
 
-### Custom cells
+### Custom cells (elements)
 ```julia
 grid = get_ferrite_grid(filename; user_elements::Dict{String,DataType}=Dict{String,DataType}())
 ```
-Supply a dictionary with keys being the element code filename and the value being the corresponding concrete subtype of `AbstractCell` in Ferrite. Additionally, you should overload the function 
+Supply a dictionary with keys being element codes in the mesh file `filename` and the value being the corresponding concrete subtype of `Ferrite.AbstractCell`. Additionally, you should overload the function with your `CellType`
 ```julia
 FerriteMeshParser.create_cell(::Type{CellType}, node_numbers, format::FerriteMeshParser.AbaqusMeshFormat) where{CellType<:Ferrite.AbstractCell}
 ```
