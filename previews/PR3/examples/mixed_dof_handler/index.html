@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>Using the MixedDofHandler · FerriteMeshParser.jl</title><script data-outdated-warner src="../../assets/warner.js"></script><link rel="canonical" href="https://KnutAM.github.io/FerriteMeshParser.jl/examples/mixed_dof_handler/"/><link href="https://cdnjs.cloudflare.com/ajax/libs/lato-font/3.0.0/css/lato-font.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/juliamono/0.039/juliamono-regular.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/fontawesome.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/solid.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/brands.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.13.11/katex.min.css" rel="stylesheet" type="text/css"/><script>documenterBaseURL="../.."</script><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" data-main="../../assets/documenter.js"></script><script src="../../siteinfo.js"></script><script src="../../../versions.js"></script><script src="../../../copy.js"></script><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/documenter-dark.css" data-theme-name="documenter-dark" data-theme-primary-dark/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/documenter-light.css" data-theme-name="documenter-light" data-theme-primary/><script src="../../assets/themeswap.js"></script></head><body><div id="documenter"><nav class="docs-sidebar"><div class="docs-package-name"><span class="docs-autofit"><a href="../../">FerriteMeshParser.jl</a></span></div><form class="docs-search" action="../../search/"><input class="docs-search-query" id="documenter-search-query" name="q" type="text" placeholder="Search docs"/></form><ul class="docs-menu"><li><a class="tocitem" href="../../">Home</a></li><li><span class="tocitem">Examples</span><ul><li><a class="tocitem" href="../compact_tension/">2d mixed mesh import</a></li><li><a class="tocitem" href="../user_element/">User element</a></li><li class="is-active"><a class="tocitem" href>Using the MixedDofHandler</a><ul class="internal"><li><a class="tocitem" href="#Imported-Abaqus-mesh"><span>Imported Abaqus mesh</span></a></li><li><a class="tocitem" href="#Importing-mesh"><span>Importing mesh</span></a></li><li><a class="tocitem" href="#mixed-dof-handler-plain-program"><span>Plain Program</span></a></li></ul></li></ul></li></ul><div class="docs-version-selector field has-addons"><div class="control"><span class="docs-label button is-static is-size-7">Version</span></div><div class="docs-selector control is-expanded"><div class="select is-fullwidth is-size-7"><select id="documenter-version-selector"></select></div></div></div></nav><div class="docs-main"><header class="docs-navbar"><nav class="breadcrumb"><ul class="is-hidden-mobile"><li><a class="is-disabled">Examples</a></li><li class="is-active"><a href>Using the MixedDofHandler</a></li></ul><ul class="is-hidden-tablet"><li class="is-active"><a href>Using the MixedDofHandler</a></li></ul></nav><div class="docs-right"><a class="docs-edit-link" href="https://github.com/KnutAM/FerriteMeshParser.jl/blob/main/docs/src/literate/mixed_dof_handler.jl" title="Edit on GitHub"><span class="docs-icon fab"></span><span class="docs-label is-hidden-touch">Edit on GitHub</span></a><a class="docs-settings-button fas fa-cog" id="documenter-settings-button" href="#" title="Settings"></a><a class="docs-sidebar-button fa fa-bars is-hidden-desktop" id="documenter-sidebar-button" href="#"></a></div></header><article class="content" id="documenter-page"><h1 id="Using-the-MixedDofHandler"><a class="docs-heading-anchor" href="#Using-the-MixedDofHandler">Using the MixedDofHandler</a><a id="Using-the-MixedDofHandler-1"></a><a class="docs-heading-anchor-permalink" href="#Using-the-MixedDofHandler" title="Permalink"></a></h1><p>In this example, we will import a 2d mesh of a Compact Tension (CT) specimen from Abaqus to simulate the elastic stresses around the crack tip</p><h2 id="Imported-Abaqus-mesh"><a class="docs-heading-anchor" href="#Imported-Abaqus-mesh">Imported Abaqus mesh</a><a id="Imported-Abaqus-mesh-1"></a><a class="docs-heading-anchor-permalink" href="#Imported-Abaqus-mesh" title="Permalink"></a></h2><p><img src="../compact_tension_specimen.svg" alt/> Figure 1: Geometry and sets, mesh overview and detailed mesh from Abaqus.</p><p>We have created sets for the hole (blue line: &quot;Hole&quot;), the symmetry edge (red line: &quot;Symmetry&quot;), and the crack zone (green area: &quot;CrackZone&quot;).</p><h2 id="Importing-mesh"><a class="docs-heading-anchor" href="#Importing-mesh">Importing mesh</a><a id="Importing-mesh-1"></a><a class="docs-heading-anchor-permalink" href="#Importing-mesh" title="Permalink"></a></h2><p>The mesh above was created in Abaqus cae, and in this example we import the generated input file: <a href="../compact_tension.inp">compact_tension.inp</a></p><p>Installation of required packages for reference using Pkg Pkg.add(&quot;Ferrite&quot;) Pkg.add(&quot;Tensors&quot;) Pkg.add(&quot;https://github.com/KnutAM/FerriteMeshParser.jl.git&quot;)</p><p>Required packages</p><pre><code class="language-julia hljs">using Ferrite, FerriteMeshParser, Tensors</code></pre><p>Simplified setup of linear isotropic elasticity for plane strain</p><pre><code class="language-julia hljs">function material_stiffness(E=210.e3, ν=0.3)
+    G = E / 2(1 + ν)
+    K = E / 3(1 - 2ν)
+    I2 = one(SymmetricTensor{2,3})
+    I4vol = I2⊗I2
+    I4dev = otimesu(I2,I2) - I4vol / 3
+    stiff_3d = 2G*I4dev + K*I4vol
+    return SymmetricTensor{4,2}((i,j,k,l)-&gt;stiff_3d[i,j,k,l])
+end</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">material_stiffness (generic function with 3 methods)</code></pre><p>Assembly of all cells</p><pre><code class="language-julia hljs">function doassemble!(cv, K, dh)
+    first_cellid = Dict(key =&gt; first(getcellset(dh.grid, key)) for key in keys(cv))
+    ndpc = Dict(key =&gt; ndofs_per_cell(dh, first_cellid[key]) for key in keys(cv))
+    Ke = Dict(key =&gt; zeros(n,n) for (key,n) in ndpc)
+
+    f = zeros(ndofs(dh))
+    assembler = start_assemble(K, f)
+
+    for key in keys(cv)
+        for cell in CellIterator(dh, collect(getcellset(dh.grid, key)))
+            assemble_cell!(assembler, cell, cv[key], Ke[key])
+        end
+    end
+end</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">doassemble! (generic function with 1 method)</code></pre><p>Assembly of specific cell (to allow dispatch on different celltypes)</p><pre><code class="language-julia hljs">function assemble_cell!(assembler, cell, cv, Ke)
+    reinit!(cv, cell)
+    n_basefuncs = getnbasefunctions(cv)
+    fill!(Ke, 0)
+    for q_point in 1:getnquadpoints(cv)
+        dσdϵ = material_stiffness()
+        dΩ = getdetJdV(cv, q_point)
+        for i in 1:n_basefuncs
+            δ∇N = shape_symmetric_gradient(cv, q_point, i)
+            for j in 1:n_basefuncs
+                ∇N = shape_symmetric_gradient(cv, q_point, j)
+                Ke[i, j] += δ∇N ⊡ dσdϵ ⊡ ∇N * dΩ
+            end
+        end
+    end
+    assemble!(assembler, celldofs(cell), Ke)
+end</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">assemble_cell! (generic function with 1 method)</code></pre><p>Solve the finite element problem</p><pre><code class="language-julia hljs">function solve()
+    # Import grid from abaqus mesh
+    grid = get_ferrite_grid(joinpath(@__DIR__, &quot;compact_tension.inp&quot;))
+
+    # Setup the interpolation and integration for each field
+    dim=Ferrite.getdim(grid)
+    grid_keys = [&quot;CPS4R&quot;, &quot;CPS3&quot;]
+    qr = Dict(&quot;CPS4R&quot;=&gt;QuadratureRule{dim, RefCube}(2), &quot;CPS3&quot;=&gt;QuadratureRule{dim, RefTetrahedron}(1))
+    ip = Dict(&quot;CPS4R&quot;=&gt;Lagrange{dim, RefCube, 1}(), &quot;CPS3&quot;=&gt;Lagrange{dim, RefTetrahedron, 1}())
+    cv = Dict(key=&gt;CellVectorValues(qr[key], ip[key]) for key in keys(ip))
+
+    # Setup the MixedDofHandler
+    fields = Dict(key=&gt;Field(:u, ip[key], dim) for key in keys(ip))
+    dh = MixedDofHandler(grid)
+    for key in grid_keys # Use grid_keys to ensure correct order
+        push!(dh, FieldHandler([fields[key]], getcellset(grid, key)))
+    end
+    close!(dh)
+
+    # Add boundary conditions
+    ch = ConstraintHandler(dh);
+    bc_sym = Dirichlet(:u, getfaceset(grid, &quot;Symmetry&quot;), (x, t) -&gt; 0, 1)
+    bc_hole = Dirichlet(:u, getfaceset(grid, &quot;Hole&quot;), (x, t) -&gt; Vec{2}((-t, 0.0)), [1,2])
+
+    # Happens to be only quad elements on constrainted surfaces. How to do this more generally?
+    add!(ch, dh.fieldhandlers[1], bc_sym)
+    add!(ch, dh.fieldhandlers[1], bc_hole)
+    close!(ch)
+
+    # Assemble stiffness matrix
+    K = create_sparsity_pattern(dh);
+    doassemble!(cv, K, dh)
+
+    # Solve linear equation system
+    f = zeros(ndofs(dh))
+    update!(ch, 1.0)
+    apply!(K, f, ch)
+    u = K\f
+
+    # Save displacement field
+    vtk_grid(joinpath(@__DIR__, &quot;mixed_dof_handler&quot;), dh) do vtk
+        vtk_point_data(vtk, dh, u)
+    end
+end</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">solve (generic function with 1 method)</code></pre><p>Solve the actual problem</p><pre><code class="language-julia hljs">solve()</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">1-element Vector{String}:
+ &quot;/home/runner/work/FerriteMeshPa&quot; ⋯ 39 bytes ⋯ &quot;/examples/mixed_dof_handler.vtu&quot;</code></pre><h2 id="mixed-dof-handler-plain-program"><a class="docs-heading-anchor" href="#mixed-dof-handler-plain-program">Plain Program</a><a id="mixed-dof-handler-plain-program-1"></a><a class="docs-heading-anchor-permalink" href="#mixed-dof-handler-plain-program" title="Permalink"></a></h2><p>Below follows a version of the program without any comments. The file is also available here: <a href="../mixed_dof_handler.jl">mixed<em>dof</em>handler.jl</a></p><pre><code class="language-julia hljs">using Ferrite, FerriteMeshParser, Tensors
+
+function material_stiffness(E=210.e3, ν=0.3)
+    G = E / 2(1 + ν)
+    K = E / 3(1 - 2ν)
+    I2 = one(SymmetricTensor{2,3})
+    I4vol = I2⊗I2
+    I4dev = otimesu(I2,I2) - I4vol / 3
+    stiff_3d = 2G*I4dev + K*I4vol
+    return SymmetricTensor{4,2}((i,j,k,l)-&gt;stiff_3d[i,j,k,l])
+end
+
+function doassemble!(cv, K, dh)
+    first_cellid = Dict(key =&gt; first(getcellset(dh.grid, key)) for key in keys(cv))
+    ndpc = Dict(key =&gt; ndofs_per_cell(dh, first_cellid[key]) for key in keys(cv))
+    Ke = Dict(key =&gt; zeros(n,n) for (key,n) in ndpc)
+
+    f = zeros(ndofs(dh))
+    assembler = start_assemble(K, f)
+
+    for key in keys(cv)
+        for cell in CellIterator(dh, collect(getcellset(dh.grid, key)))
+            assemble_cell!(assembler, cell, cv[key], Ke[key])
+        end
+    end
+end
+
+function assemble_cell!(assembler, cell, cv, Ke)
+    reinit!(cv, cell)
+    n_basefuncs = getnbasefunctions(cv)
+    fill!(Ke, 0)
+    for q_point in 1:getnquadpoints(cv)
+        dσdϵ = material_stiffness()
+        dΩ = getdetJdV(cv, q_point)
+        for i in 1:n_basefuncs
+            δ∇N = shape_symmetric_gradient(cv, q_point, i)
+            for j in 1:n_basefuncs
+                ∇N = shape_symmetric_gradient(cv, q_point, j)
+                Ke[i, j] += δ∇N ⊡ dσdϵ ⊡ ∇N * dΩ
+            end
+        end
+    end
+    assemble!(assembler, celldofs(cell), Ke)
+end
+
+function solve()
+    # Import grid from abaqus mesh
+    grid = get_ferrite_grid(joinpath(@__DIR__, &quot;compact_tension.inp&quot;))
+
+    # Setup the interpolation and integration for each field
+    dim=Ferrite.getdim(grid)
+    grid_keys = [&quot;CPS4R&quot;, &quot;CPS3&quot;]
+    qr = Dict(&quot;CPS4R&quot;=&gt;QuadratureRule{dim, RefCube}(2), &quot;CPS3&quot;=&gt;QuadratureRule{dim, RefTetrahedron}(1))
+    ip = Dict(&quot;CPS4R&quot;=&gt;Lagrange{dim, RefCube, 1}(), &quot;CPS3&quot;=&gt;Lagrange{dim, RefTetrahedron, 1}())
+    cv = Dict(key=&gt;CellVectorValues(qr[key], ip[key]) for key in keys(ip))
+
+    # Setup the MixedDofHandler
+    fields = Dict(key=&gt;Field(:u, ip[key], dim) for key in keys(ip))
+    dh = MixedDofHandler(grid)
+    for key in grid_keys # Use grid_keys to ensure correct order
+        push!(dh, FieldHandler([fields[key]], getcellset(grid, key)))
+    end
+    close!(dh)
+
+    # Add boundary conditions
+    ch = ConstraintHandler(dh);
+    bc_sym = Dirichlet(:u, getfaceset(grid, &quot;Symmetry&quot;), (x, t) -&gt; 0, 1)
+    bc_hole = Dirichlet(:u, getfaceset(grid, &quot;Hole&quot;), (x, t) -&gt; Vec{2}((-t, 0.0)), [1,2])
+
+    # Happens to be only quad elements on constrainted surfaces. How to do this more generally?
+    add!(ch, dh.fieldhandlers[1], bc_sym)
+    add!(ch, dh.fieldhandlers[1], bc_hole)
+    close!(ch)
+
+    # Assemble stiffness matrix
+    K = create_sparsity_pattern(dh);
+    doassemble!(cv, K, dh)
+
+    # Solve linear equation system
+    f = zeros(ndofs(dh))
+    update!(ch, 1.0)
+    apply!(K, f, ch)
+    u = K\f
+
+    # Save displacement field
+    vtk_grid(joinpath(@__DIR__, &quot;mixed_dof_handler&quot;), dh) do vtk
+        vtk_point_data(vtk, dh, u)
+    end
+end
+
+solve()
+
+# This file was generated using Literate.jl, https://github.com/fredrikekre/Literate.jl</code></pre><hr/><p><em>This page was generated using <a href="https://github.com/fredrikekre/Literate.jl">Literate.jl</a>.</em></p></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../user_element/">« User element</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 0.27.12 on <span class="colophon-date" title="Sunday 20 February 2022 12:55">Sunday 20 February 2022</span>. Using Julia version 1.7.2.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
