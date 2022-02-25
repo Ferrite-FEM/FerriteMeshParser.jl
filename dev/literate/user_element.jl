@@ -1,6 +1,7 @@
 # # User element
 # In this example, we will add support for an element that is currently not 
-# supported inside the package: The linear wedge element, `C3D6`
+# supported inside the package: The linear wedge element, `C3D6`, defined in
+# [wedge_element.inp](wedge_element.inp)
 # 
 # ![](wedge_element.svg)
 # 
