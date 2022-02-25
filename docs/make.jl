@@ -12,11 +12,11 @@ DocMeta.setdocmeta!(FerriteMeshParser, :DocTestSetup, :(using FerriteMeshParser)
 
 makedocs(;
     authors="Knut Andreas Meyer and contributors",
-    repo="https://github.com/KnutAM/FerriteMeshParser.jl/blob/{commit}{path}#{line}",
+    repo="https://github.com/Ferrite-FEM/FerriteMeshParser.jl/blob/{commit}{path}#{line}",
     sitename="FerriteMeshParser.jl",
     format=Documenter.HTML(;
         prettyurls=is_ci,
-        canonical="https://KnutAM.github.io/FerriteMeshParser.jl",
+        canonical="https://Ferrite-FEM.github.io/FerriteMeshParser.jl",
         assets=String[],
     ),
     pages=[
@@ -26,6 +26,6 @@ makedocs(;
 )
 
 deploydocs(;
-    repo="github.com/KnutAM/FerriteMeshParser.jl",
+    repo="github.com/Ferrite-FEM/FerriteMeshParser.jl",
     devbranch="main",
 )
