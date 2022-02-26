@@ -1,13 +1,14 @@
 name = "FerriteMeshParser"
 uuid = "0f8c756f-80dd-4a75-85c6-b0a5ab9d4620"
 authors = ["Knut Andreas Meyer and contributors"]
-version = "0.1.0"
+version = "0.0.1"
 
 [deps]
 Ferrite = "c061ca5d-56c9-439f-9c0e-210fe06d3992"
 
 [compat]
 julia = "1"
+Ferrite = "0.3"
 
 [extras]
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
