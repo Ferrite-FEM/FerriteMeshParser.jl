@@ -28,4 +28,5 @@ makedocs(;
 deploydocs(;
     repo="github.com/Ferrite-FEM/FerriteMeshParser.jl",
     devbranch="main",
+    push_preview=true,
 )
