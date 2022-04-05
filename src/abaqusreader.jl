@@ -94,29 +94,29 @@ function read_mesh(filename, ::AbaqusMeshFormat)
                 continue
             end
             DEBUG_PARSE && println("H: $header")
-            if startswith(header, "*Node")
+            if startswith(lowercase(header), "*node")
                 DEBUG_PARSE && println("Reading nodes")
                 read_dim = read_abaqus_nodes!(f, node_numbers, coord_vec)
                 dim == 0 && (dim = read_dim)  # Set dim if not yet set
                 read_dim != dim && throw(DimensionMismatch("Not allowed to mix nodes in different dimensions"))
-            elseif startswith(header, "*Element")
-                if ((m = match(r"\*Element, type=(.*), ELSET=(.*)", header)) !== nothing)
+            elseif startswith(lowercase(header), "*element")
+                if ((m = match(r"\*Element, type=(.*), ELSET=(.*)"i, header)) !== nothing)
                     DEBUG_PARSE && println("Reading elements with elset")
                     read_abaqus_elements!(f, topology_vectors, element_number_vectors,  m.captures[1], m.captures[2], element_sets)
-                elseif ((m = match(r"\*Element, type=(.*)", header)) !== nothing)
+                elseif ((m = match(r"\*Element, type=(.*)"i, header)) !== nothing)
                     DEBUG_PARSE && println("Reading elements without elset")
                     read_abaqus_elements!(f, topology_vectors, element_number_vectors,  m.captures[1])
                 end
-            elseif ((m = match(r"\*Elset, elset=(.*)", header)) !== nothing)
+            elseif ((m = match(r"\*Elset, elset=(.*)"i, header)) !== nothing)
                 DEBUG_PARSE && println("Reading elementset")
                 read_abaqus_set!(f, elementsets, m.captures[1])
-            elseif ((m = match(r"\*Nset, nset=(.*)", header)) !== nothing)
+            elseif ((m = match(r"\*Nset, nset=(.*)"i, header)) !== nothing)
                 DEBUG_PARSE && println("Reading nodeset")
                 read_abaqus_set!(f, nodesets, m.captures[1])
-            elseif startswith(header, "*Part")
+            elseif startswith(lowercase(header), "*part")
                 DEBUG_PARSE && println("Increment part counter")
                 part_counter += 1
-            elseif startswith(header, "*Instance")
+            elseif startswith(lowercase(header), "*instance")
                 DEBUG_PARSE && println("Increment instance counter")
                 instance_counter += 1
                 discardlinesuntil(f, stopsign='*')  # Instances contain translations, or start with *Node if independent mesh
