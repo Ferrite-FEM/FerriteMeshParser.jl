@@ -82,3 +82,11 @@ end
         @test getfield(grid0, key) == getfield(grid2, key)
     end
 end
+
+@testset "caseinsensitive" begin
+    filename = joinpath(@__DIR__, "test_files", "uppercase_test.inp")
+    grid = get_ferrite_grid(filename)
+    @test getncells(grid) == 2
+    @test getnnodes(grid) == 6
+end
+    
