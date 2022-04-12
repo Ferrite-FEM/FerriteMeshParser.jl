@@ -1,7 +1,10 @@
+import Base: ==
 using FerriteMeshParser
 using Ferrite
 using Test
 
+# Define equality check between grids
+==(a::Grid,b::Grid) = all([isequal(getfield.((a,b), (name,))...) for name in fieldnames(typeof(a))])
 
 # Overload default_interpolation where not given in Ferrite
 if !isdefined(Main, :SerendipityQuadrilateral)
@@ -90,3 +93,30 @@ end
     @test getnnodes(grid) == 6
 end
     
+@testset "sets" begin
+    filename = joinpath(@__DIR__, "test_files", "generated_set.inp")
+    grid = get_ferrite_grid(filename)
+    @test getcellset(grid, "lower") == Set(1:8)
+    @test getnodeset(grid, "lower") == Set((1,  2,  3,  4,  7,  8,  9, 10, 11, 12, 13, 14, 20, 21, 22))
+
+    filename = joinpath(@__DIR__, "test_files", "2D_UnitArea_Quadratic.inp")
+    grid = get_ferrite_grid(filename)
+    @test getcellset(grid, "mysetname") == Set((1,))
+end
+
+@testset "custom_cells" begin
+    filename = joinpath(@__DIR__, "test_files", "unsupported_element.inp")
+    grid = get_ferrite_grid(filename; user_elements=Dict("CPS5R"=>Cell{2,4,4}))
+    @test getcellset(grid, "CPS5R") == Set((1,))
+    @test isa(getcells(grid)[1], Cell{2,4,4})
+end
+
+@testset "specify_file_type" begin
+    filename = joinpath(@__DIR__, "test_files", "2D_UnitArea_Quadratic.inp")
+    filename_cp = joinpath(@__DIR__, "tmp.txt")
+    cp(filename, filename_cp; force=true)
+    grid_cp = get_ferrite_grid(filename_cp; meshformat=FerriteMeshParser.AbaqusMeshFormat())
+    grid = get_ferrite_grid(filename)
+    @test grid_cp == grid
+    rm(filename_cp)
+end
