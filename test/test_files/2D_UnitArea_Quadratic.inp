@@ -27,7 +27,7 @@
       9,          0.5,           0.
      10,           2.,           0.
      11,           2.,          0.5
-*Element, type=CPS8
+*Element, type=CPS8, ELSET=mysetname
 1, 1, 2, 3, 4, 6, 7, 8, 9
 *Element, type=CPS6M
 2,  2,  1,  5,  6, 10, 11
