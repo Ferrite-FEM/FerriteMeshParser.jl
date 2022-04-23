@@ -67,6 +67,8 @@ end
     showerror(io, FerriteMeshParser.UndetectableMeshFormatError(test_string))
     @test contains(String(take!(io)), test_string)
 
+    filename = joinpath(@__DIR__, "runtests.jl")
+    @test_throws FerriteMeshParser.InvalidFileContent get_ferrite_grid(filename; meshformat=FerriteMeshParser.AbaqusMeshFormat())
 
     filename = joinpath(@__DIR__, "test_files", "twoinstances.inp")
     @test_throws FerriteMeshParser.InvalidFileContent get_ferrite_grid(filename)
