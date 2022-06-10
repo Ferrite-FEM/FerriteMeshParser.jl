@@ -35,3 +35,6 @@ if you have a `CellType` that is not a subtype of `Ferrite.Cell`, or if the node
 ## Current limitations
 * Only one part and one instance can exist in the input file
 * Node and element numbers must start at 1 and not have any gaps (e.g if there are 10 nodes, no node number higher than 10 can be given)
+
+## Contributors
+The code was originally written by [KristofferC](https://github.com/KristofferC) and [kimauth](https://github.com/kimauth)
