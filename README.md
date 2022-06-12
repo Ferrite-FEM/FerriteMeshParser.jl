@@ -12,7 +12,8 @@ Pull requests that add julia code to parse other mesh formats are very welcome! 
 A very brief intro is given here, please see the [docs](https://Ferrite-FEM.github.io/FerriteMeshParser.jl/dev) for further details and examples
 ### Installation
 ```julia
-]add https://github.com/Ferrite-FEM/FerriteMeshParser.jl.git
+]add FerriteMeshParser
+using FerriteMeshParser
 ```
 
 ### Basic usage
