@@ -30,7 +30,12 @@ include("abaqusreader.jl")
 include("gridcreator.jl")
 
 """
-    function get_ferrite_grid(filename; meshformat=AutomaticMeshFormat(), user_elements=Dict{String,DataType}(), generate_facesets=true)
+    function get_ferrite_grid(
+        filename; 
+        meshformat=AutomaticMeshFormat(), 
+        user_elements=Dict{String,DataType}(), 
+        generate_facesets=true
+        )
 
 Greate a `Ferrite.Grid` by reading in the file specified by `filename`.
 
@@ -38,8 +43,8 @@ Optional arguments:
 * `meshformat`: Which format the mesh 
     is given in, normally automatically detected by the file extension
 * `user_elements`: Used to add extra elements not supported,
-    might require separate cell constructor.
-* `generate_facesets`: Should facesets be detected automatically from all nodesets?
+    might require a separate cell constructor.
+* `generate_facesets`: Should facesets be automatically generated from all nodesets?
 
 """
 function get_ferrite_grid(filename; meshformat=AutomaticMeshFormat(), user_elements::Dict{String,DataType}=Dict{String,DataType}(), generate_facesets::Bool=true)
@@ -52,13 +57,17 @@ function get_ferrite_grid(filename; meshformat=AutomaticMeshFormat(), user_eleme
 end
 
 """
-    create_faceset(grid::Ferrite.AbstractGrid, nodeset::Set{Int}, cellset::Union{Nothing,Set{Int}}=nothing)
+    create_faceset(
+        grid::Ferrite.AbstractGrid, 
+        nodeset::Set{Int}, 
+        cellset::Union{Nothing,Set{Int}}=nothing
+        )
 
 Find the faces in the grid for which all nodes are in `nodeset`. Return them as a `Set{FaceIndex}`.
 A `cellset` can be given to only look only for faces amongst those cells to speed up the computation. 
 Otherwise the search is over all cells.
 
-This function is normally only required if calling `get_ferrite_grid` with `generate_facesets=false`. 
+This function is normally only required when calling `get_ferrite_grid` with `generate_facesets=false`. 
 The created `faceset` can be added to the grid as `merge!(getfacesets(grid), Dict("facesetkey" => faceset))`
 """
 function create_faceset(grid::Ferrite.AbstractGrid, nodeset::Set{Int}, ::Nothing=nothing)
