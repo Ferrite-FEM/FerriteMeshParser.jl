@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
  - 
 ### Changed
+ - For a mixed grid, the celltype is a union of all concrete cell types in the grid [#15][gh15]
  - 
 ### Fixed
  - 
@@ -16,6 +17,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [0.1.3]
 *Start of changelog*
 
+[gh15]: https://github.com/Ferrite-FEM/FerriteMeshParser.jl/pull/15
 
 [Unreleased]: https://github.com/Ferrite-FEM/Ferrite.jl/compare/v0.1.3...HEAD
 [0.1.3]: https://github.com/Ferrite-FEM/FerriteMeshParser.jl/compare/v0.1.2...v0.1.3
