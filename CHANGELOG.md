@@ -19,5 +19,5 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 [gh15]: https://github.com/Ferrite-FEM/FerriteMeshParser.jl/pull/15
 
-[Unreleased]: https://github.com/Ferrite-FEM/Ferrite.jl/compare/v0.1.3...HEAD
+[Unreleased]: https://github.com/Ferrite-FEM/FerriteMeshParser.jl/compare/v0.1.3...HEAD
 [0.1.3]: https://github.com/Ferrite-FEM/FerriteMeshParser.jl/compare/v0.1.2...v0.1.3
