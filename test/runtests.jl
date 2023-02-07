@@ -3,7 +3,6 @@ using FerriteMeshParser
 using Ferrite
 using Test
 using Aqua
-import ForwardDiff
 
 Aqua.test_all(FerriteMeshParser; ambiguities = false)
 Aqua.test_ambiguities(FerriteMeshParser)    # This excludes Core and Base, which gets many ambiguities with ForwardDiff
@@ -35,7 +34,7 @@ Ferrite.faces(c::SerendipityQuadrilateral) = ((c.nodes[1],c.nodes[2]), (c.nodes[
         fields = [Field(:u, Ferrite.default_interpolation(type), 1) for type in unique_celltypes]
         cellsets = [findall(x->isa(x,type), grid.cells) for type in unique_celltypes]
         fieldhandlers = [FieldHandler([field], Set(set)) for (field,set) in zip(fields, cellsets)]
-        push!.((dh,), fieldhandlers)
+        add!.((dh,), fieldhandlers)
         close!(dh)
 
         cv_vec = Any[]
