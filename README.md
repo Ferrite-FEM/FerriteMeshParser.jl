@@ -3,6 +3,7 @@
 [![Dev](https://img.shields.io/badge/docs-dev-blue.svg)](https://Ferrite-FEM.github.io/FerriteMeshParser.jl/dev)
 [![Build Status](https://github.com/Ferrite-FEM/FerriteMeshParser.jl/actions/workflows/CI.yml/badge.svg?branch=main)](https://github.com/Ferrite-FEM/FerriteMeshParser.jl/actions/workflows/CI.yml?query=branch%3Amain)
 [![Coverage](https://codecov.io/gh/Ferrite-FEM/FerriteMeshParser.jl/branch/main/graph/badge.svg)](https://codecov.io/gh/Ferrite-FEM/FerriteMeshParser.jl)
+[![Aqua QA](https://raw.githubusercontent.com/JuliaTesting/Aqua.jl/master/badge.svg)](https://github.com/JuliaTesting/Aqua.jl)
 
 Import mesh from Abaqus input (`.inp`) files into `Ferrite.jl`'s `Grid` type. User-defined cell types are supported. 
 
@@ -12,7 +13,8 @@ Pull requests that add julia code to parse other mesh formats are very welcome! 
 A very brief intro is given here, please see the [docs](https://Ferrite-FEM.github.io/FerriteMeshParser.jl/dev) for further details and examples
 ### Installation
 ```julia
-]add https://github.com/Ferrite-FEM/FerriteMeshParser.jl.git
+]add FerriteMeshParser
+using FerriteMeshParser
 ```
 
 ### Basic usage
@@ -35,3 +37,6 @@ if you have a `CellType` that is not a subtype of `Ferrite.Cell`, or if the node
 ## Current limitations
 * Only one part and one instance can exist in the input file
 * Node and element numbers must start at 1 and not have any gaps (e.g if there are 10 nodes, no node number higher than 10 can be given)
+
+## Contributors
+The code was originally written by [KristofferC](https://github.com/KristofferC) and [kimauth](https://github.com/kimauth)

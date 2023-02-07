@@ -30,8 +30,9 @@ function create_cells(rawelementsdict::Dict{String,RawElements}, user_elements::
             throw(UnsupportedElementType(key))
         end
     end
-    cell_type = promote_type(unique(typeof.(cells_generic))...)
-    cells = Array{cell_type}([cell for cell in cells_generic])  # Ensures that an as concrete type as possible returned. 
+    # Return a Union of cell types as this should be faster to use than a generic cell
+    cell_type = Union{(typeof.(unique(typeof,cells_generic))...)}
+    cells = convert(Array{cell_type}, cells_generic)
     return cells
 end
 
