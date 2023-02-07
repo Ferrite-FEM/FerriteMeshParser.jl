@@ -3,7 +3,6 @@ using FerriteMeshParser
 using Ferrite
 using Test
 using Aqua
-import ForwardDiff
 
 Aqua.test_all(FerriteMeshParser; ambiguities = false)
 Aqua.test_ambiguities(FerriteMeshParser)    # This excludes Core and Base, which gets many ambiguities with ForwardDiff
