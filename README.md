@@ -3,6 +3,7 @@
 [![Dev](https://img.shields.io/badge/docs-dev-blue.svg)](https://Ferrite-FEM.github.io/FerriteMeshParser.jl/dev)
 [![Build Status](https://github.com/Ferrite-FEM/FerriteMeshParser.jl/actions/workflows/CI.yml/badge.svg?branch=main)](https://github.com/Ferrite-FEM/FerriteMeshParser.jl/actions/workflows/CI.yml?query=branch%3Amain)
 [![Coverage](https://codecov.io/gh/Ferrite-FEM/FerriteMeshParser.jl/branch/main/graph/badge.svg)](https://codecov.io/gh/Ferrite-FEM/FerriteMeshParser.jl)
+[![Aqua QA](https://raw.githubusercontent.com/JuliaTesting/Aqua.jl/master/badge.svg)](https://github.com/JuliaTesting/Aqua.jl)
 
 Import mesh from Abaqus input (`.inp`) files into `Ferrite.jl`'s `Grid` type. User-defined cell types are supported. 
 
