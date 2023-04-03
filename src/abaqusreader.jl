@@ -57,8 +57,8 @@ end
 
 function read_abaqus_set!(f, sets, setname::AbstractString)
     if endswith(setname, "generate")
-        splitted_line = split(strip(eat_line(f)), ",", keepempty = false)
-        start, stop, step = [parse(Int, x) for x in splitted_line]
+        split_line = split(strip(eat_line(f)), ",", keepempty = false)
+        start, stop, step = [parse(Int, x) for x in split_line]
         indices = collect(start:step:stop)
         setname = split(setname, [','])[1]
     else
