@@ -1,5 +1,2 @@
-[default.extend-words]
-fo = "fo"
-ket = "ket"
-trun = "trun"
-varius = "varius"
+[files]
+extend-exclude = ["*.svg", "*.inp"]
