@@ -6,9 +6,9 @@ GENERATEDDIR = joinpath(@__DIR__, "src", "examples")
 mkpath(GENERATEDDIR)
 
 # Copy supplementary files first
-suplementary_fileextensions = [".inp", ".svg", ".png", ".jpg", ".gif"]
+supplementary_fileextensions = [".inp", ".svg", ".png", ".jpg", ".gif"]
 for example in readdir(EXAMPLEDIR)
-    if any(endswith.(example, suplementary_fileextensions))
+    if any(endswith.(example, supplementary_fileextensions))
         cp(joinpath(EXAMPLEDIR, example), joinpath(GENERATEDDIR, example); force=true)
     end
 end
@@ -27,7 +27,7 @@ for example in readdir(EXAMPLEDIR)
         Literate.markdown(input, GENERATEDDIR, postprocess = mdpost)
         Literate.notebook(input, GENERATEDDIR, execute = is_ci) # Don't execute locally
     else
-        if !any(endswith.(example, suplementary_fileextensions))
+        if !any(endswith.(example, supplementary_fileextensions))
             @warn "ignoring $example"
         end
     end

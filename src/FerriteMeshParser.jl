@@ -37,7 +37,7 @@ include("gridcreator.jl")
         generate_facesets=true
         )
 
-Greate a `Ferrite.Grid` by reading in the file specified by `filename`.
+Create a `Ferrite.Grid` by reading in the file specified by `filename`.
 
 Optional arguments:
 * `meshformat`: Which format the mesh 
