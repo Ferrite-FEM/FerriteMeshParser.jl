@@ -1,6 +1,7 @@
 import Base: ==
 using FerriteMeshParser
 using Ferrite
+using Random
 using Test
 using Aqua
 
@@ -73,14 +74,26 @@ end
 end
 
 @testset "exceptions" begin
+    test_string = randstring(10)
+    io = IOBuffer()
+
     filename = joinpath(@__DIR__, "runtests.jl")
-    @test_throws FerriteMeshParser.UndetectableMeshFormatError get_ferrite_grid(filename) 
+    @test_throws FerriteMeshParser.UndetectableMeshFormatError get_ferrite_grid(filename)
+    showerror(io, FerriteMeshParser.UndetectableMeshFormatError(test_string))
+    @test contains(String(take!(io)), test_string)
+
+    filename = joinpath(@__DIR__, "runtests.jl")
+    @test_throws FerriteMeshParser.InvalidFileContent get_ferrite_grid(filename; meshformat=FerriteMeshParser.AbaqusMeshFormat())
 
     filename = gettestfile("twoinstances.inp")
-    @test_throws FerriteMeshParser.InvalidFileContent get_ferrite_grid(filename) 
+    @test_throws FerriteMeshParser.InvalidFileContent get_ferrite_grid(filename)
+    showerror(io, FerriteMeshParser.InvalidFileContent(test_string))
+    @test contains(String(take!(io)), test_string)
 
     filename = gettestfile("unsupported_element.inp")
-    @test_throws FerriteMeshParser.UnsupportedElementType get_ferrite_grid(filename) 
+    @test_throws FerriteMeshParser.UnsupportedElementType get_ferrite_grid(filename)
+    showerror(io, FerriteMeshParser.UnsupportedElementType(test_string))
+    @test contains(String(take!(io)), test_string)
 
 end
 
