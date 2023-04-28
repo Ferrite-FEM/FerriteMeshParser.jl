@@ -27,11 +27,14 @@ grid = get_ferrite_grid(filename)
 ```julia
 grid = get_ferrite_grid(filename; user_elements::Dict{String,DataType}=Dict{String,DataType}())
 ```
-Supply a dictionary with keys being element codes in the mesh file `filename` and the value being the corresponding concrete subtype of `Ferrite.AbstractCell`. Additionally, you have to overload the function
+Supply a dictionary with keys being element codes in the mesh file `filename` and the value being the corresponding concrete subtype of `Ferrite.AbstractCell`. 
+
+Additionally, you may have to overload the function
 ```julia
 FerriteMeshParser.create_cell(::Type{CellType}, node_numbers, format::FerriteMeshParser.AbaqusMeshFormat) where{CellType<:Ferrite.AbstractCell}
 ```
-if you have a `CellType` that is not a subtype of `Ferrite.Cell`, or if the node order of `CellType` is different from that in the input file. `create_cell` should return an instance of your subtype of `Ferrite.AbstractCell` with the given node_numbers. 
+Overloading is required if the constructor of your `CellType` needs different constructor input arguments than a tuple of node indices in the order given in the input file. 
+`create_cell` should return an instance of your subtype of `Ferrite.AbstractCell` with the given node_numbers. 
 
 
 ## Current limitations
