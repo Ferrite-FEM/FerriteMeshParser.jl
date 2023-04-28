@@ -11,9 +11,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-
 ### Fixed
- - 
+
+
+## [0.1.6]
+### Fixed
+ - Update to new Cell parameterization to work for Ferrite#master [#20][gh20]
 
 ## [0.1.4]
 ### Changed
@@ -22,6 +25,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [0.1.3]
 *Start of changelog*
 
+[gh20]: https://github.com/Ferrite-FEM/FerriteMeshParser.jl/pull/20
 [gh15]: https://github.com/Ferrite-FEM/FerriteMeshParser.jl/pull/15
 
 [Unreleased]: https://github.com/Ferrite-FEM/FerriteMeshParser.jl/compare/v0.1.3...HEAD
