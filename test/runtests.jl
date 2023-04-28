@@ -22,6 +22,22 @@ Ferrite.default_interpolation(::Type{SerendipityQuadrilateral}) = Serendipity{2,
 Ferrite.vertices(c::SerendipityQuadrilateral) = (c.nodes[1], c.nodes[2], c.nodes[3], c.nodes[4])
 Ferrite.faces(c::SerendipityQuadrilateral) = ((c.nodes[1],c.nodes[2]), (c.nodes[2],c.nodes[3]), (c.nodes[3],c.nodes[4]), (c.nodes[4],c.nodes[1]))
 
+function setup_dofhandler(grid, unique_celltypes)
+    if isdefined(Ferrite, :MixedDofHandler) && Ferrite.MixedDofHandler isa Function
+        dh = DofHandler(grid)
+    else
+        dh = MixedDofHandler(grid)
+    end
+    # Might need to move more of this code up later 
+    fields = [Field(:u, Ferrite.default_interpolation(type), 1) for type in unique_celltypes]
+    cellsets = [findall(x->isa(x,type), grid.cells) for type in unique_celltypes]
+    fieldhandlers = [FieldHandler([field], Set(set)) for (field,set) in zip(fields, cellsets)]
+    add!.((dh,), fieldhandlers)
+    close!(dh)
+
+    return dh, cellsets
+end
+
 @testset "CheckVolumes" begin
     unit_volume_files = ("2D_UnitArea_Linear", "2D_UnitArea_Quadratic", 
                          "3D_UnitVolume_LinearHexahedron", "3D_UnitVolume_LinearTetrahedron",
@@ -29,14 +45,9 @@ Ferrite.faces(c::SerendipityQuadrilateral) = ((c.nodes[1],c.nodes[2]), (c.nodes[
     for base_name in unit_volume_files
         filename = gettestfile(base_name*".inp")
         grid = get_ferrite_grid(filename)
-        dh = MixedDofHandler(grid)
         unique_celltypes = unique(typeof.(grid.cells))
         
-        fields = [Field(:u, Ferrite.default_interpolation(type), 1) for type in unique_celltypes]
-        cellsets = [findall(x->isa(x,type), grid.cells) for type in unique_celltypes]
-        fieldhandlers = [FieldHandler([field], Set(set)) for (field,set) in zip(fields, cellsets)]
-        add!.((dh,), fieldhandlers)
-        close!(dh)
+        dh, cellsets = setup_dofhandler(grid, unique_celltypes)
 
         cv_vec = Any[]
         for type in unique_celltypes
@@ -132,11 +143,13 @@ end
     @test getcellset(grid, "mysetname") == Set((1,))
 end
 
+
+
 @testset "custom_cells" begin
     filename = gettestfile("unsupported_element.inp")
-    grid = get_ferrite_grid(filename; user_elements=Dict("CPS5R"=>Cell{2,4,4}))
-    @test getcellset(grid, "CPS5R") == Set((1,))
-    @test isa(getcells(grid)[1], Cell{2,4,4})
+    grid = get_ferrite_grid(filename; user_elements=Dict("CUSTOM4CELL"=>Quadrilateral))
+    @test getcellset(grid, "CUSTOM4CELL") == Set((1,))
+    @test isa(getcells(grid)[1], Quadrilateral)
 end
 
 @testset "specify_file_type" begin

@@ -20,7 +20,7 @@
       3,           0.,           1.
       4,           0.,           0.
       5,           3.,           0.
-*Element, type=CPS5R
+*Element, type=CUSTOM4CELL
 1, 1, 2, 3, 4
 *Element, type=CPS3
 2, 2, 1, 5
