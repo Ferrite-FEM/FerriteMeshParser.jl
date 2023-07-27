@@ -27,3 +27,9 @@
 *End Instance
 **  
 *End Assembly
+** 
+** MATERIALS
+** 
+*Material, name=dummy
+*Elastic
+1., 0.2

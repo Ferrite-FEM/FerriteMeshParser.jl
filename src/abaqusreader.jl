@@ -124,6 +124,7 @@ function read_mesh(filename, ::AbaqusMeshFormat)
                 DEBUG_PARSE && println("Discarding keyword content")
                 discardlinesuntil(f, stopsign='*')
             else
+                eof(f) && break # discardlinesuntil will stop at eof, and last line read again and incorrectly considered a "header"
                 throw(InvalidFileContent("Unknown header, \"$header\", in file \"$filename\". Could also indicate an incomplete file"))
             end
         end
