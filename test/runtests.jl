@@ -81,7 +81,9 @@ end
 @testset "facesetgeneration" begin
     filename = gettestfile("compact_tension.inp")
     grid = get_ferrite_grid(filename)
-    @test create_faceset(grid, getnodeset(grid, "Hole")) == create_faceset(grid, getnodeset(grid, "Hole"), getcellset(grid, "Hole"))    # Test that including cells doesn't change the created sets
+    face_set = create_faceset(grid, getnodeset(grid, "Hole"))
+    @test getfaceset(grid, "Hole") == face_set
+    @test face_set == create_faceset(grid, getnodeset(grid, "Hole"), getcellset(grid, "Hole"))    # Test that including cells doesn't change the created sets
 end
 
 @testset "exceptions" begin

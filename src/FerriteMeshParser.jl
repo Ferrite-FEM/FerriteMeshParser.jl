@@ -60,7 +60,7 @@ end
     create_faceset(
         grid::Ferrite.AbstractGrid, 
         nodeset::Set{Int}, 
-        cellset::Union{Nothing,Set{Int}}=nothing
+        cellset::Union{UnitRange{Int},Set{Int}}=1:getncells(grid)
         )
 
 Find the faces in the grid for which all nodes are in `nodeset`. Return them as a `Set{FaceIndex}`.
@@ -68,31 +68,17 @@ A `cellset` can be given to only look only for faces amongst those cells to spee
 Otherwise the search is over all cells.
 
 This function is normally only required when calling `get_ferrite_grid` with `generate_facesets=false`. 
-The created `faceset` can be added to the grid as `merge!(getfacesets(grid), Dict("facesetkey" => faceset))`
+The created `faceset` can be added to the grid as `addfaceset!(grid, "facesetkey", faceset)`
 """
-function create_faceset(grid::Ferrite.AbstractGrid, nodeset::Set{Int}, ::Nothing=nothing)
-    faceset = Set{FaceIndex}()
+function create_faceset(grid::Ferrite.AbstractGrid, nodeset::Set{Int}, cellset=1:getncells(grid))
+    faceset = sizehint!(Set{FaceIndex}(), length(nodeset))
     for (cellid, cell) in enumerate(getcells(grid))
-        if any(map(n-> n ∈ nodeset, cell.nodes))
-            # check actual faces
+        cellid ∈ cellset || continue
+        if any(n-> n ∈ nodeset, cell.nodes)
             for (faceid, face) in enumerate(Ferrite.faces(cell))
-                if all(map(n -> n ∈ nodeset, face))
+                if all(n -> n ∈ nodeset, face)
                     push!(faceset, FaceIndex(cellid, faceid))
                 end
-            end
-        end
-    end
-    return faceset
-end
-
-function create_faceset(grid::Ferrite.AbstractGrid, nodeset::Set{Int}, cellset::Set{Int})
-    faceset = Set{FaceIndex}()
-    cellrange = collect(cellset)
-    for (i, cell) in enumerate(getcells(grid)[cellrange])
-        cellid = cellrange[i]
-        for (faceid, face) in enumerate(Ferrite.faces(cell))
-            if all(map(n -> n ∈ nodeset, face))
-                push!(faceset, FaceIndex(cellid, faceid))
             end
         end
     end

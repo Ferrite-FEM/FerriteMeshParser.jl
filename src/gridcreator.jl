@@ -61,8 +61,8 @@ end
 Based on all nodesets in `grid`, generate facesets for those sets.
 """
 function generate_facesets!(grid::Ferrite.Grid)
-    cellset_or_nothing = Dict(key => (haskey(getcellsets(grid), key) ? getcellsets(grid)[key] : nothing) 
-                                for (key, set) in getnodesets(grid))
-    merge!(getfacesets(grid), Dict(key => create_faceset(grid, set, cellset_or_nothing[key])
-                                for (key, set) in getnodesets(grid)))
+    for (key, set) in Ferrite.getnodesets(grid)
+        cellset = get(Ferrite.getcellsets(grid), key, 1:getncells(grid))
+        addfaceset!(grid, key, create_faceset(grid, set, cellset))
+    end
 end
