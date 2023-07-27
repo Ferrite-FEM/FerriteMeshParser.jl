@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
  - 
 
 ### Changed
+ - create_faceset(grid, nodeset, ::Nothing) no longer supported, use create_faceset(grid, nodeset) instead
 
 ### Fixed
 
