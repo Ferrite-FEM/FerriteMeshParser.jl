@@ -7,7 +7,7 @@
 
 Import mesh from Abaqus input (`.inp`) files into `Ferrite.jl`'s `Grid` type. User-defined cell types are supported. 
 
-Pull requests that add julia code to parse other mesh formats are very welcome! Note that for [`Gmsh`](https://gmsh.info/), the package [`FerriteGmsh.jl`](https://github.com/Ferrite-FEM/FerriteGmsh.jl) already provides a versitile interface.
+Pull requests that add Julia code to parse other mesh formats are very welcome! Note that for [`Gmsh`](https://gmsh.info/), the package [`FerriteGmsh.jl`](https://github.com/Ferrite-FEM/FerriteGmsh.jl) already provides a versatile interface.
 
 ## Getting started
 A very brief intro is given here, please see the [docs](https://Ferrite-FEM.github.io/FerriteMeshParser.jl/dev) for further details and examples
