@@ -47,7 +47,8 @@ end
         grid = get_ferrite_grid(filename)
         unique_celltypes = unique(typeof.(grid.cells))
         
-        dh, cellsets = setup_dofhandler(grid, unique_celltypes)
+        #dh, cellsets = setup_dofhandler(grid, unique_celltypes)
+        cellsets = [findall(x->isa(x,type), grid.cells) for type in unique_celltypes]
 
         cv_vec = Any[]
         for type in unique_celltypes
@@ -59,7 +60,7 @@ end
         end
         
         for (cellset, cv, type) in zip(cellsets, cv_vec, unique_celltypes)
-            for cell in CellIterator(dh, cellset)
+            for cell in CellIterator(grid, cellset)
                 reinit!(cv, cell)
                 V = getdetJdV(cv, 1)
                 volcheck = V ≈ 1.0
