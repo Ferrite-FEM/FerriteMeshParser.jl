@@ -3,7 +3,7 @@ function create_grid(mesh::RawMesh, format, user_elements)
     cells = create_cells(getelementsdicts(mesh), user_elements, format)
     nodes = create_nodes(getnodes(mesh), Val(dim))
     cellsets = create_cellsets(getelementsdicts(mesh), getelementsets(mesh))
-    nodesets = create_nodesets(getnodesets(mesh))
+    nodesets = create_nodesets(Ferrite.getnodesets(mesh))
     return Grid(cells, nodes; cellsets=cellsets, nodesets=nodesets)
 end
 
