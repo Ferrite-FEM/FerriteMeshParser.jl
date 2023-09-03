@@ -44,8 +44,8 @@ Ferrite.faces(c::SerendipityQuadrilateral) = ((c.nodes[1],c.nodes[2]), (c.nodes[
         end
         
         for (cellset, cv, type) in zip(cellsets, cv_vec, unique_celltypes)
-            for cell in CellIterator(grid, cellset)
-                reinit!(cv, cell)
+            for cellnr in cellset
+                reinit!(cv, getcoordinates(grid, cellnr))
                 V = getdetJdV(cv, 1)
                 volcheck = V ≈ 1.0
                 !volcheck && println("Volume check failure for \"$base_name.inp\" with a cell of type \"$type\"")
