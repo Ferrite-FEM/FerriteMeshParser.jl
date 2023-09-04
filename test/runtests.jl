@@ -23,9 +23,9 @@ if !isdefined(Main, :SerendipityQuadrilateral)
 end
 
 if isdefined(Ferrite, :FieldHandler)
-    quadrule(ip; order=1) = QuadratureRule{Ferrite.getdim(ip), Ferrite.getrefshape(ip)}(order)
+    create_cell_values(ip; order=1) = CellScalarValues(QuadratureRule{Ferrite.getdim(ip), Ferrite.getrefshape(ip)}(order), ip, ip)
 else # v1.0
-    quadrule(ip; order=1) = QuadratureRule{Ferrite.getrefshape(ip)}(order)
+    create_cell_values(ip; order=1) = CellValues(QuadratureRule{Ferrite.getrefshape(ip)}(order), ip, ip)
 end
 
 @testset "CheckVolumes" begin
@@ -43,8 +43,7 @@ end
         cv_vec = Any[]
         for type in unique_celltypes
             ip = Ferrite.default_interpolation(type)
-            qr = quadrule(ip; order=1)
-            push!(cv_vec, CellScalarValues(qr, ip))
+            push!(cv_vec, create_cell_values(ip; order=1))
         end
         
         for (cellset, cv, type) in zip(cellsets, cv_vec, unique_celltypes)
