@@ -17,10 +17,16 @@ gettestfile(args...) = joinpath(@__DIR__, "test_files", args...)
 # Overload default_interpolation where not given in Ferrite
 if !isdefined(Main, :SerendipityQuadrilateral)
     const SerendipityQuadrilateral = Cell{2,8,4}
+    Ferrite.default_interpolation(::Type{SerendipityQuadrilateral}) = Serendipity{2, RefCube, 2}()
+    Ferrite.vertices(c::SerendipityQuadrilateral) = (c.nodes[1], c.nodes[2], c.nodes[3], c.nodes[4])
+    Ferrite.faces(c::SerendipityQuadrilateral) = ((c.nodes[1],c.nodes[2]), (c.nodes[2],c.nodes[3]), (c.nodes[3],c.nodes[4]), (c.nodes[4],c.nodes[1]))
 end
-Ferrite.default_interpolation(::Type{SerendipityQuadrilateral}) = Serendipity{2, RefCube, 2}()
-Ferrite.vertices(c::SerendipityQuadrilateral) = (c.nodes[1], c.nodes[2], c.nodes[3], c.nodes[4])
-Ferrite.faces(c::SerendipityQuadrilateral) = ((c.nodes[1],c.nodes[2]), (c.nodes[2],c.nodes[3]), (c.nodes[3],c.nodes[4]), (c.nodes[4],c.nodes[1]))
+
+if isdefined(Ferrite, :FieldHandler)
+    quadrule(ip; order=1) = QuadratureRule{Ferrite.getdim(ip), Ferrite.getrefshape(ip)}(order)
+else # v1.0
+    quadrule(ip; order=1) = QuadratureRule{Ferrite.getrefshape(ip)}(order)
+end
 
 @testset "CheckVolumes" begin
     unit_volume_files = ("2D_UnitArea_Linear", "2D_UnitArea_Quadratic", 
@@ -37,9 +43,7 @@ Ferrite.faces(c::SerendipityQuadrilateral) = ((c.nodes[1],c.nodes[2]), (c.nodes[
         cv_vec = Any[]
         for type in unique_celltypes
             ip = Ferrite.default_interpolation(type)
-            dim = Ferrite.getdim(ip)
-            ref = Ferrite.getrefshape(ip)
-            qr = QuadratureRule{dim, ref}(1)
+            qr = quadrule(ip; order=1)
             push!(cv_vec, CellScalarValues(qr, ip))
         end
         
