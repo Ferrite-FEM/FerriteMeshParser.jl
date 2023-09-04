@@ -17,25 +17,15 @@ gettestfile(args...) = joinpath(@__DIR__, "test_files", args...)
 # Overload default_interpolation where not given in Ferrite
 if !isdefined(Main, :SerendipityQuadrilateral)
     const SerendipityQuadrilateral = Cell{2,8,4}
+    Ferrite.default_interpolation(::Type{SerendipityQuadrilateral}) = Serendipity{2, RefCube, 2}()
+    Ferrite.vertices(c::SerendipityQuadrilateral) = (c.nodes[1], c.nodes[2], c.nodes[3], c.nodes[4])
+    Ferrite.faces(c::SerendipityQuadrilateral) = ((c.nodes[1],c.nodes[2]), (c.nodes[2],c.nodes[3]), (c.nodes[3],c.nodes[4]), (c.nodes[4],c.nodes[1]))
 end
-Ferrite.default_interpolation(::Type{SerendipityQuadrilateral}) = Serendipity{2, RefCube, 2}()
-Ferrite.vertices(c::SerendipityQuadrilateral) = (c.nodes[1], c.nodes[2], c.nodes[3], c.nodes[4])
-Ferrite.faces(c::SerendipityQuadrilateral) = ((c.nodes[1],c.nodes[2]), (c.nodes[2],c.nodes[3]), (c.nodes[3],c.nodes[4]), (c.nodes[4],c.nodes[1]))
 
-function setup_dofhandler(grid, unique_celltypes)
-    if isdefined(Ferrite, :MixedDofHandler) && Ferrite.MixedDofHandler isa Function
-        dh = DofHandler(grid)
-    else
-        dh = MixedDofHandler(grid)
-    end
-    # Might need to move more of this code up later 
-    fields = [Field(:u, Ferrite.default_interpolation(type), 1) for type in unique_celltypes]
-    cellsets = [findall(x->isa(x,type), grid.cells) for type in unique_celltypes]
-    fieldhandlers = [FieldHandler([field], Set(set)) for (field,set) in zip(fields, cellsets)]
-    add!.((dh,), fieldhandlers)
-    close!(dh)
-
-    return dh, cellsets
+if isdefined(Ferrite, :FieldHandler)
+    create_cell_values(ip; order=1) = CellScalarValues(QuadratureRule{Ferrite.getdim(ip), Ferrite.getrefshape(ip)}(order), ip, ip)
+else # v1.0
+    create_cell_values(ip; order=1) = CellValues(QuadratureRule{Ferrite.getrefshape(ip)}(order), ip, ip)
 end
 
 @testset "CheckVolumes" begin
@@ -47,20 +37,18 @@ end
         grid = get_ferrite_grid(filename)
         unique_celltypes = unique(typeof.(grid.cells))
         
-        dh, cellsets = setup_dofhandler(grid, unique_celltypes)
+        #dh, cellsets = setup_dofhandler(grid, unique_celltypes)
+        cellsets = [findall(x->isa(x,type), grid.cells) for type in unique_celltypes]
 
         cv_vec = Any[]
         for type in unique_celltypes
             ip = Ferrite.default_interpolation(type)
-            dim = Ferrite.getdim(ip)
-            ref = Ferrite.getrefshape(ip)
-            qr = QuadratureRule{dim, ref}(1)
-            push!(cv_vec, CellScalarValues(qr, ip))
+            push!(cv_vec, create_cell_values(ip; order=1))
         end
         
         for (cellset, cv, type) in zip(cellsets, cv_vec, unique_celltypes)
-            for cell in CellIterator(dh, cellset)
-                reinit!(cv, cell)
+            for cellnr in cellset
+                reinit!(cv, getcoordinates(grid, cellnr))
                 V = getdetJdV(cv, 1)
                 volcheck = V ≈ 1.0
                 !volcheck && println("Volume check failure for \"$base_name.inp\" with a cell of type \"$type\"")
