@@ -25,22 +25,22 @@ println(typeof(grid))
 println(unique(typeof.(getcells(grid))))    # The different cell types in the grid
 
 # Furthermore, the node and cell sets are imported
-println([(key, length(set)) for (key, set) in getnodesets(grid)])
-println([(key, length(set)) for (key, set) in getcellsets(grid)])
+println([(key, length(set)) for (key, set) in Ferrite.getnodesets(grid)])
+println([(key, length(set)) for (key, set) in Ferrite.getcellsets(grid)])
 
 # As we see, in addition to the sets created in Abaqus, the cellsets also include a set 
 # for each abaqus element type (useful if you for example defined reduced integration
 # in only part of the domain and want to have this in Ferrite). Finally, facesets are 
 # automatically created by default (can be turned off by `generate_facesets=false` 
 # argument) based on the nodesets:
-println([(key, length(set)) for (key, set) in getfacesets(grid)])
+println([(key, length(set)) for (key, set) in Ferrite.getfacesets(grid)])
 # Clearly, the faceset `"CrackZone"` doesn't make much sense, but unless the mesh is 
 # very large it doesn't hurt. The facesets can be created manually from each nodeset
 # by using the `create_faceset` function: 
 faceset = create_faceset(grid, getnodeset(grid,"Hole"));
 # This can if desired be merged into the grid by
-merge!(getfacesets(grid), Dict("HoleManual" => faceset))
-println([(key, length(set)) for (key, set) in getfacesets(grid)])
+merge!(Ferrite.getfacesets(grid), Dict("HoleManual" => faceset))
+println([(key, length(set)) for (key, set) in Ferrite.getfacesets(grid)])
 
 # 
 #md # ## [Plain Program](@id compact-tension-plain-program)
