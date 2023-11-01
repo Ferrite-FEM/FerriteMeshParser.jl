@@ -5,15 +5,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
-### Added
- - 
+
+## [0.1.8]
+
+### Changed
+ - `nodeset::AbstractSet` is allowed in create_faceset(grid, nodeset)
+
+## [0.1.7]
 
 ### Changed
  - create_faceset(grid, nodeset, ::Nothing) no longer supported, use create_faceset(grid, nodeset) instead
-
-### Fixed
-
 
 ## [0.1.6]
 ### Fixed
