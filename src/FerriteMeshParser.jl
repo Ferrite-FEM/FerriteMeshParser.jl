@@ -70,7 +70,7 @@ Otherwise the search is over all cells.
 This function is normally only required when calling `get_ferrite_grid` with `generate_facesets=false`. 
 The created `faceset` can be added to the grid as `addfaceset!(grid, "facesetkey", faceset)`
 """
-function create_faceset(grid::Ferrite.AbstractGrid, nodeset::Set{Int}, cellset=1:getncells(grid))
+function create_faceset(grid::Ferrite.AbstractGrid, nodeset::AbstractSet{Int}, cellset=1:getncells(grid))
     faceset = sizehint!(Set{FaceIndex}(), length(nodeset))
     for (cellid, cell) in enumerate(getcells(grid))
         cellid ∈ cellset || continue
