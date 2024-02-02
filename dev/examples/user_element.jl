@@ -9,4 +9,3 @@ println(typeof(grid))
 println(unique(typeof.(getcells(grid))))    # The different cell types in the grid
 
 # This file was generated using Literate.jl, https://github.com/fredrikekre/Literate.jl
-

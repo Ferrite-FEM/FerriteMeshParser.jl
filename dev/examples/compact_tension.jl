@@ -16,4 +16,3 @@ merge!(Ferrite.getfacesets(grid), Dict("HoleManual" => faceset))
 println([(key, length(set)) for (key, set) in Ferrite.getfacesets(grid)])
 
 # This file was generated using Literate.jl, https://github.com/fredrikekre/Literate.jl
-
