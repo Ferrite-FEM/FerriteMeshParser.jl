@@ -21,5 +21,5 @@ get_ferrite_grid
 ```
 
 ```@docs
-create_faceset
+create_facetset
 ```
