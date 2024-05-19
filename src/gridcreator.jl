@@ -17,9 +17,9 @@ function create_nodes(rawnodes::RawNodes, ::Val{dim}) where{dim}
     return nodes
 end
 
-function create_cells(rawelementsdict::Dict{String,RawElements}, user_elements::Dict, format)
+function create_cells(rawelementsdict::Dict{String, RawElements}, user_elements::Dict, format)
     builtin_elements = get_element_type_dict(format)
-    num_elements = sum(getnumelements.(values(rawelementsdict)))
+    num_elements = sum(getnumelements, values(rawelementsdict))
     cells_generic = Array{Ferrite.AbstractCell}(undef, num_elements)
     for (key, rawelements) in rawelementsdict
         if haskey(user_elements, key)   # user_elements are prioritized over builtin
@@ -31,14 +31,14 @@ function create_cells(rawelementsdict::Dict{String,RawElements}, user_elements::
         end
     end
     # Return a Union of cell types as this should be faster to use than a generic cell
-    cell_type = Union{(typeof.(unique(typeof,cells_generic))...)}
-    cells = convert(Array{cell_type}, cells_generic)
+    CellType = Union{(typeof.(unique(typeof, cells_generic))...)}
+    cells = convert(Array{CellType}, cells_generic)
     return cells
 end
 
 function addcells!(cells, elementtype, rawelements::RawElements, format)
     for (i, element_number) in enumerate(getnumbers(rawelements))
-        node_numbers = gettopology(rawelements)[:,i]
+        node_numbers = gettopology(rawelements)[:, i]
         cells[element_number] = create_cell(elementtype, node_numbers, format)
     end
 end
@@ -56,13 +56,15 @@ end
 
 
 """
-    function generate_facesets!(grid::Ferrite.Grid)
+    function generate_facetsets!(grid::Ferrite.Grid)
 
 Based on all nodesets in `grid`, generate facesets for those sets.
+If there is a cellset in the grid with the same name as the nodeset,
+only facets for cells in that cellset with be created.
 """
-function generate_facesets!(grid::Ferrite.Grid)
+function generate_facetsets!(grid::Ferrite.Grid)
     for (key, set) in Ferrite.getnodesets(grid)
         cellset = get(Ferrite.getcellsets(grid), key, 1:getncells(grid))
-        addfaceset!(grid, key, create_faceset(grid, set, cellset))
+        addfacetset!(grid, key, create_facetset(grid, set, cellset))
     end
 end
