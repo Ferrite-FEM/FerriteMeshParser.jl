@@ -100,6 +100,9 @@ end
     showerror(io, FerriteMeshParser.UnsupportedElementType(test_string))
     @test contains(String(take!(io)), test_string)
 
+    grid = get_ferrite_grid(gettestfile("compact_tension.inp"))
+    nset = getnodeset(grid, "Hole")
+    @test_throws ErrorException("create_faceset is no longer supported, use create_facetset instead") create_faceset(grid, nset)
 end
 
 @testset "ordering" begin
