@@ -22,6 +22,10 @@ if !isdefined(Main, :SerendipityQuadrilateral)
     Ferrite.faces(c::SerendipityQuadrilateral) = ((c.nodes[1],c.nodes[2]), (c.nodes[2],c.nodes[3]), (c.nodes[3],c.nodes[4]), (c.nodes[4],c.nodes[1]))
 end
 
+if !isdefined(Ferrite, :getfacetset)
+    getfacetset(args...) = Ferrite.getfaceset(args...)
+end
+
 if isdefined(Ferrite, :FieldHandler)
     create_cell_values(ip; order=1) = CellScalarValues(QuadratureRule{Ferrite.getdim(ip), Ferrite.getrefshape(ip)}(order), ip, ip)
 else # v1.0
@@ -66,11 +70,11 @@ end
     @test _getgridtype(grid_mixed) == Union{Triangle,Quadrilateral}
 end
 
-@testset "facesetgeneration" begin
+@testset "facet set generation" begin
     filename = gettestfile("compact_tension.inp")
     grid = get_ferrite_grid(filename)
     face_set = create_facetset(grid, getnodeset(grid, "Hole"))
-    @test getfaceset(grid, "Hole") == face_set
+    @test getfacetset(grid, "Hole") == face_set
     @test face_set == create_facetset(grid, getnodeset(grid, "Hole"), getcellset(grid, "Hole"))    # Test that including cells doesn't change the created sets
 end
 
