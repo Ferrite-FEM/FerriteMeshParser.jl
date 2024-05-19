@@ -7,7 +7,7 @@ using Aqua
 
 Aqua.test_all(FerriteMeshParser; ambiguities = false)
 Aqua.test_ambiguities(FerriteMeshParser)    # This excludes Core and Base, which gets many ambiguities with ForwardDiff
-
+ 
 # Function to retrieve test fields
 gettestfile(args...) = joinpath(@__DIR__, "test_files", args...)
 
