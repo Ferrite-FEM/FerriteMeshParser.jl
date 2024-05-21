@@ -7,7 +7,7 @@ using Aqua
 
 Aqua.test_all(FerriteMeshParser; ambiguities = false)
 Aqua.test_ambiguities(FerriteMeshParser)    # This excludes Core and Base, which gets many ambiguities with ForwardDiff
-
+ 
 # Function to retrieve test fields
 gettestfile(args...) = joinpath(@__DIR__, "test_files", args...)
 
@@ -20,6 +20,10 @@ if !isdefined(Main, :SerendipityQuadrilateral)
     Ferrite.default_interpolation(::Type{SerendipityQuadrilateral}) = Serendipity{2, RefCube, 2}()
     Ferrite.vertices(c::SerendipityQuadrilateral) = (c.nodes[1], c.nodes[2], c.nodes[3], c.nodes[4])
     Ferrite.faces(c::SerendipityQuadrilateral) = ((c.nodes[1],c.nodes[2]), (c.nodes[2],c.nodes[3]), (c.nodes[3],c.nodes[4]), (c.nodes[4],c.nodes[1]))
+end
+
+if !isdefined(Ferrite, :getfacetset)
+    getfacetset(args...) = Ferrite.getfaceset(args...)
 end
 
 if isdefined(Ferrite, :FieldHandler)
@@ -66,12 +70,12 @@ end
     @test _getgridtype(grid_mixed) == Union{Triangle,Quadrilateral}
 end
 
-@testset "facesetgeneration" begin
+@testset "facet set generation" begin
     filename = gettestfile("compact_tension.inp")
     grid = get_ferrite_grid(filename)
-    face_set = create_faceset(grid, getnodeset(grid, "Hole"))
-    @test getfaceset(grid, "Hole") == face_set
-    @test face_set == create_faceset(grid, getnodeset(grid, "Hole"), getcellset(grid, "Hole"))    # Test that including cells doesn't change the created sets
+    face_set = create_facetset(grid, getnodeset(grid, "Hole"))
+    @test getfacetset(grid, "Hole") == face_set
+    @test face_set == create_facetset(grid, getnodeset(grid, "Hole"), getcellset(grid, "Hole"))    # Test that including cells doesn't change the created sets
 end
 
 @testset "exceptions" begin
@@ -96,6 +100,9 @@ end
     showerror(io, FerriteMeshParser.UnsupportedElementType(test_string))
     @test contains(String(take!(io)), test_string)
 
+    grid = get_ferrite_grid(gettestfile("compact_tension.inp"))
+    nset = getnodeset(grid, "Hole")
+    @test_throws ErrorException("create_faceset is no longer supported, use create_facetset instead") create_faceset(grid, nset)
 end
 
 @testset "ordering" begin
