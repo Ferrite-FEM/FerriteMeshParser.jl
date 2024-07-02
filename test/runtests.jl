@@ -32,6 +32,10 @@ else # v1.0
     create_cell_values(ip; order=1) = CellValues(QuadratureRule{Ferrite.getrefshape(ip)}(order), ip, ip)
 end
 
+if !isdefined(Ferrite, :geometric_interpolation)
+    geometric_interpolation(c) = Ferrite.default_interpolation(c)
+end
+
 @testset "CheckVolumes" begin
     unit_volume_files = ("2D_UnitArea_Linear", "2D_UnitArea_Quadratic", 
                          "3D_UnitVolume_LinearHexahedron", "3D_UnitVolume_LinearTetrahedron",
@@ -41,16 +45,11 @@ end
         grid = get_ferrite_grid(filename)
         unique_celltypes = unique(typeof.(grid.cells))
         
-        #dh, cellsets = setup_dofhandler(grid, unique_celltypes)
-        cellsets = [findall(x->isa(x,type), grid.cells) for type in unique_celltypes]
-
-        cv_vec = Any[]
-        for type in unique_celltypes
-            ip = Ferrite.default_interpolation(type)
-            push!(cv_vec, create_cell_values(ip; order=1))
-        end
+        cellsets = [findall(x -> isa(x, cell_type), grid.cells) for cell_type in unique_celltypes]
         
-        for (cellset, cv, type) in zip(cellsets, cv_vec, unique_celltypes)
+        for (cellset, cell_type) in zip(cellsets, unique_celltypes)
+            ip = geometric_interpolation(cell_type)
+            cv = create_cell_values(ip; order=1)
             for cellnr in cellset
                 reinit!(cv, getcoordinates(grid, cellnr))
                 V = getdetJdV(cv, 1)
