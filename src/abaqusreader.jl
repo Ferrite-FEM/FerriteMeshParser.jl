@@ -1,5 +1,87 @@
 isabaquskeyword(l) = startswith(l, "*")
 
+struct AbaqusKeyword
+    keyword::String
+    parameters::Vector
+    data::Vector{Vector}
+end
+
+function parse_abaqus(s)
+    parsed = tryparse(Int, s)
+    !isnothing(parsed) && return parsed
+    parsed = tryparse(Float64, s)
+    !isnothing(parsed) && return parsed
+    startswith(s, '"') && endswith(s, '"') && return s[2:end-1]
+    return s
+end
+
+# skips comment lines and supports continuation
+# removes whitespace splits at comma and capitalizes everything not in quotes
+# parses sections to Ints or Floats where possible
+function readline_abaqus(f)
+    line = readline(f)
+    while startswith(line, "**")
+        line = strip(readline(f))
+    end
+    while endswith(line, ",")
+        eof(f) && throw(InvalidFileContent("Reached end of file on line continuation"))
+        next = strip(readline(f))
+        startswith(next, "**") && continue
+        line *= next
+    end
+    quoted_split = split(line, '"') # even indices -> quoted; odd inices not quoted
+    sections = String[""]
+    for (i, s) in pairs(quoted_split)
+        if isodd(i)
+            s = replace(s, " " => "")
+            s = uppercase(s)
+            s_split = split(s, ',')
+            sections[end] *= first(s_split)
+            append!(sections, s_split[2:end])
+        else
+            sections[end] *= s
+        end
+    end
+    sections_parsed = Vector(undef, length(sections))
+    for (i, s) in pairs(sections)
+        parsed = parse_abaqus(s)
+        if parsed != s || !contains(s, '=')
+            sections_parsed[i] = parsed
+        else contains(s, '=')
+            s_split = split(s, '=', limit=2)
+            sections_parsed[i] = first(s_split) => parse_abaqus(last(s_split))
+        end
+    end
+    # skip over comments after reading the line
+    # to make eof work as expected
+    while true
+        mark(f)
+        startswith(readline(f), "**") || break
+    end
+    reset(f)
+
+    return sections_parsed
+end
+
+function read_keywords(filename)
+    keywords = AbaqusKeyword[]
+
+    open(filename) do f
+        while !eof(f)
+            if peek(f, Char) == '*' 
+                line = readline_abaqus(f)
+                keyword = AbaqusKeyword(line[1], line[2:end], Vector[])
+                push!(keywords, keyword)
+            else
+                line = readline_abaqus(f)
+                push!(keywords[end].data, line)
+            end
+        end
+    end
+
+    return keywords
+end
+
 function join_multiline_elementdata(element_data::Vector{<:AbstractString})
     fixed_element_data = copy(element_data)
     i = 0
