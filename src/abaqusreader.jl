@@ -37,6 +37,7 @@ function eatline_abaqus(f)
         next = strip(readline(f))
         isodd(count('"', line)) && throw(InvalidFileContent("Quoted strings cannot span multiple lines!"))
         startswith(next, "**") && continue
+        startswith(next, '*') && throw(InvalidFileContent("Ran into new keyword during line continuation"))
         line *= next
     end
     DEBUG_PARSE && println("Ate: " * line)
