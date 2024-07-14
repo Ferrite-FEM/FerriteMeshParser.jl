@@ -15,6 +15,14 @@ function parse_abaqus(s)
     return s
 end
 
+function skipcomments(f)
+    while true
+        mark(f)
+        startswith(readline(f), "**") || break
+    end
+    reset(f)
+end
+
 # skips comment lines and supports continuation
 # removes whitespace splits at comma and capitalizes everything not in quotes
 # parses sections to Ints or Floats where possible
@@ -54,12 +62,7 @@ function readline_abaqus(f)
     end
     # skip over comments after reading the line
     # to make eof work as expected
-    while true
-        mark(f)
-        startswith(readline(f), "**") || break
-    end
-    reset(f)
-
+    skipcomments(f)
     return sections_parsed
 end
 
@@ -67,6 +70,7 @@ function read_keywords(filename)
     keywords = AbaqusKeyword[]
 
     open(filename) do f
+        skipcomments(f)
         while !eof(f)
             if peek(f, Char) == '*' 
                 line = readline_abaqus(f)
