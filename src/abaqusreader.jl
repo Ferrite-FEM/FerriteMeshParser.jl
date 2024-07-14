@@ -1,10 +1,19 @@
 isabaquskeyword(l) = startswith(l, "*")
 
-struct AbaqusKeyword
+struct AbaqusInpBlock
     keyword::String
-    parameters::Vector
+    parameters::LittleDict{String}
     data::Vector{Vector}
 end
+
+struct AbaqusInp
+    blocks::Vector{AbaqusInpBlock}
+end
+
+inpblocks(inp::AbaqusInp) = inp.blocks
+keyword(datablock::AbaqusInpBlock) = datablock.keyword
+datalines(datablock::AbaqusInpBlock) = datablock.data
+parameters(datablock::AbaqusInpBlock) = datablock.parameters
 
 function parse_abaqus(s)
     parsed = tryparse(Int, s)
@@ -15,75 +24,77 @@ function parse_abaqus(s)
     return s
 end
 
-function skipcomments(f)
-    while true
-        mark(f)
-        startswith(readline(f), "**") || break
-    end
-    reset(f)
-end
-
-# skips comment lines and supports continuation
-# removes whitespace splits at comma and capitalizes everything not in quotes
-# parses sections to Ints or Floats where possible
-function readline_abaqus(f)
+# skips comment lines and supports line continuation
+# removes leading and trailing whitespace
+function eatline_abaqus(f)
     line = readline(f)
     while startswith(line, "**")
         line = strip(readline(f))
+        isodd(count('"', line)) && throw(InvalidFileContent("Quoted strings cannot span multiple lines!"))
     end
     while endswith(line, ",")
-        eof(f) && throw(InvalidFileContent("Reached end of file on line continuation"))
+        eof(f) && throw(InvalidFileContent("Reached end of file on line continuation!"))
         next = strip(readline(f))
+        isodd(count('"', line)) && throw(InvalidFileContent("Quoted strings cannot span multiple lines!"))
         startswith(next, "**") && continue
         line *= next
     end
+    return line
+end
+
+# removes whitespace, splits at comma, and uppercases everything
+# while reserving quoted strings
+function clean_and_split(line)
     quoted_split = split(line, '"') # even indices -> quoted; odd inices not quoted
     sections = String[""]
     for (i, s) in pairs(quoted_split)
         if isodd(i)
             s = replace(s, " " => "")
             s = uppercase(s)
-            s_split = split(s, ',')
+            s_split = split(s, ',', keepempty=true)
             sections[end] *= first(s_split)
             append!(sections, s_split[2:end])
         else
             sections[end] *= '"' * s * '"'
         end
     end
-    sections_parsed = Vector(undef, length(sections))
-    for (i, s) in pairs(sections)
-        parsed = parse_abaqus(s)
-        if parsed != s || !contains(s, '=')
-            sections_parsed[i] = parsed
-        else contains(s, '=')
-            s_split = split(s, '=', limit=2)
-            sections_parsed[i] = first(s_split) => parse_abaqus(last(s_split))
-        end
-    end
-    # skip over comments after reading the line
-    # to make eof work as expected
-    skipcomments(f)
-    return sections_parsed
+    return sections
 end
 
-function read_keywords(filename)
-    keywords = AbaqusKeyword[]
+function parsekeywordline(line)
+    sections = clean_and_split(line)
+    parameters = LittleDict{String, Any}()
+    for parameter in sections[2:end]
+        if contains(parameter, '=')
+            (key, value) = split(parameter, '=')
+            parameters[key] = parse_abaqus(value)
+        else
+            parameters[parameter] = nothing
+        end
+    end
+    return AbaqusInpBlock(sections[1], parameters, Vector[])
+end
 
+function parsedataline(line)
+    sections = clean_and_split(line)
+    return parse_abaqus.(sections)
+end
+
+function parse_abaqus_inp(filename)
+    keywords = AbaqusInpBlock[]
     open(filename) do f
-        skipcomments(f)
         while !eof(f)
-            if peek(f, Char) == '*' 
-                line = readline_abaqus(f)
-                keyword = AbaqusKeyword(line[1], line[2:end], Vector[])
-                push!(keywords, keyword)
+            line = eatline_abaqus(f)
+            line == "" && continue
+            if isabaquskeyword(line)
+                push!(keywords, parsekeywordline(line))
             else
-                line = readline_abaqus(f)
-                push!(keywords[end].data, line)
+                isempty(keywords) && throw(InvalidFileContent("The first non-comment line must be a keyword line!"))
+                push!(keywords[end].data, parsedataline(line))
             end
         end
     end
-
-    return keywords
+    return AbaqusInp(keywords)
 end
 
 function join_multiline_elementdata(element_data::Vector{<:AbstractString})
