@@ -47,7 +47,7 @@ function readline_abaqus(f)
             sections[end] *= first(s_split)
             append!(sections, s_split[2:end])
         else
-            sections[end] *= s
+            sections[end] *= '"' * s * '"'
         end
     end
     sections_parsed = Vector(undef, length(sections))
