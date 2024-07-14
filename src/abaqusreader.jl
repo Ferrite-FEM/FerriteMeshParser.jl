@@ -39,6 +39,7 @@ function eatline_abaqus(f)
         startswith(next, "**") && continue
         line *= next
     end
+    DEBUG_PARSE && println("Ate: " * line)
     return line
 end
 
@@ -148,18 +149,24 @@ function read_mesh(filename, ::AbaqusMeshFormat)
 
     for inpblock in inpblocks(inp)
         if keyword(inpblock) == "*NODE"
+            DEBUG_PARSE && println("Reading nodes")
             read_dim = read_abaqus_nodes!(inpblock, node_numbers, coord_vec)
             dim == 0 && (dim = read_dim)  # Set dim if not yet set
             read_dim != dim && throw(DimensionMismatch("Not allowed to mix nodes in different dimensions"))
         elseif keyword(inpblock) == "*ELEMENT"
+            DEBUG_PARSE && println("Reading elements")
             read_abaqus_elements!(inpblock, topology_vectors, element_number_vectors, elementsets)
         elseif keyword(inpblock) == "*ELSET"
+            DEBUG_PARSE && println("Reading elementset")
             read_abaqus_set!(inpblock, elementsets)
         elseif keyword(inpblock) == "*NSET"
+            DEBUG_PARSE && println("Reading nodeset")
             read_abaqus_set!(inpblock, nodesets)
         elseif keyword(inpblock) == "*PART"
+            DEBUG_PARSE && println("Increment part counter")
             part_counter += 1
         elseif keyword(inpblock) == "*INSTANCE"
+            DEBUG_PARSE && println("Increment instance counter")
             instance_counter += 1
         end
     end
