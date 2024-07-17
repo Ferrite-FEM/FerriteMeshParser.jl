@@ -7,19 +7,19 @@ using Aqua
 
 Aqua.test_all(FerriteMeshParser; ambiguities = false)
 Aqua.test_ambiguities(FerriteMeshParser)    # This excludes Core and Base, which gets many ambiguities with ForwardDiff
- 
+
 # Function to retrieve test fields
 gettestfile(args...) = joinpath(@__DIR__, "test_files", args...)
 
 # Define equality check between grids
-==(a::Grid,b::Grid) = all([isequal(getfield.((a,b), (name,))...) for name in fieldnames(typeof(a))])
+==(a::Grid, b::Grid) = all([isequal(getfield.((a, b), (name,))...) for name in fieldnames(typeof(a))])
 
 # Overload default_interpolation where not given in Ferrite
 if !isdefined(Main, :SerendipityQuadrilateral)
-    const SerendipityQuadrilateral = Cell{2,8,4}
+    const SerendipityQuadrilateral = Cell{2, 8, 4}
     Ferrite.default_interpolation(::Type{SerendipityQuadrilateral}) = Serendipity{2, RefCube, 2}()
     Ferrite.vertices(c::SerendipityQuadrilateral) = (c.nodes[1], c.nodes[2], c.nodes[3], c.nodes[4])
-    Ferrite.faces(c::SerendipityQuadrilateral) = ((c.nodes[1],c.nodes[2]), (c.nodes[2],c.nodes[3]), (c.nodes[3],c.nodes[4]), (c.nodes[4],c.nodes[1]))
+    Ferrite.faces(c::SerendipityQuadrilateral) = ((c.nodes[1], c.nodes[2]), (c.nodes[2], c.nodes[3]), (c.nodes[3], c.nodes[4]), (c.nodes[4], c.nodes[1]))
 end
 
 if !isdefined(Ferrite, :getfacetset)
@@ -27,9 +27,9 @@ if !isdefined(Ferrite, :getfacetset)
 end
 
 if isdefined(Ferrite, :FieldHandler)
-    create_cell_values(ip; order=1) = CellScalarValues(QuadratureRule{Ferrite.getdim(ip), Ferrite.getrefshape(ip)}(order), ip, ip)
+    create_cell_values(ip; order = 1) = CellScalarValues(QuadratureRule{Ferrite.getdim(ip), Ferrite.getrefshape(ip)}(order), ip, ip)
 else # v1.0
-    create_cell_values(ip; order=1) = CellValues(QuadratureRule{Ferrite.getrefshape(ip)}(order), ip, ip)
+    create_cell_values(ip; order = 1) = CellValues(QuadratureRule{Ferrite.getrefshape(ip)}(order), ip, ip)
 end
 
 if !isdefined(Ferrite, :geometric_interpolation)
@@ -37,19 +37,21 @@ if !isdefined(Ferrite, :geometric_interpolation)
 end
 
 @testset "CheckVolumes" begin
-    unit_volume_files = ("2D_UnitArea_Linear", "2D_UnitArea_Quadratic", 
-                         "3D_UnitVolume_LinearHexahedron", "3D_UnitVolume_LinearTetrahedron",
-                         "3D_UnitVolume_QuadraticHexahedron", "3D_UnitVolume_QuadraticTetrahedron")
+    unit_volume_files = (
+        "2D_UnitArea_Linear", "2D_UnitArea_Quadratic",
+        "3D_UnitVolume_LinearHexahedron", "3D_UnitVolume_LinearTetrahedron",
+        "3D_UnitVolume_QuadraticHexahedron", "3D_UnitVolume_QuadraticTetrahedron",
+    )
     for base_name in unit_volume_files
-        filename = gettestfile(base_name*".inp")
+        filename = gettestfile(base_name * ".inp")
         grid = get_ferrite_grid(filename)
         unique_celltypes = unique(typeof.(grid.cells))
-        
+
         cellsets = [findall(x -> isa(x, cell_type), grid.cells) for cell_type in unique_celltypes]
-        
+
         for (cellset, cell_type) in zip(cellsets, unique_celltypes)
             ip = geometric_interpolation(cell_type)
-            cv = create_cell_values(ip; order=1)
+            cv = create_cell_values(ip; order = 1)
             for cellnr in cellset
                 reinit!(cv, getcoordinates(grid, cellnr))
                 V = getdetJdV(cv, 1)
@@ -62,11 +64,11 @@ end
 end
 
 @testset "celltype" begin
-    _getgridtype(::Grid{dim,C}) where {dim,C} = C
+    _getgridtype(::Grid{dim, C}) where {dim, C} = C
     grid_concrete = get_ferrite_grid(gettestfile("2D_CPE3.inp"))
     grid_mixed = get_ferrite_grid(gettestfile("2D_CPE3_CPE4R.inp"))
     @test isconcretetype(_getgridtype(grid_concrete))
-    @test _getgridtype(grid_mixed) == Union{Triangle,Quadrilateral}
+    @test _getgridtype(grid_mixed) == Union{Triangle, Quadrilateral}
 end
 
 @testset "facet set generation" begin
@@ -87,7 +89,7 @@ end
     @test contains(String(take!(io)), test_string)
 
     filename = joinpath(@__DIR__, "runtests.jl")
-    @test_throws FerriteMeshParser.InvalidFileContent get_ferrite_grid(filename; meshformat=FerriteMeshParser.AbaqusMeshFormat())
+    @test_throws FerriteMeshParser.InvalidFileContent get_ferrite_grid(filename; meshformat = FerriteMeshParser.AbaqusMeshFormat())
 
     filename = gettestfile("twoinstances.inp")
     @test_throws FerriteMeshParser.InvalidFileContent get_ferrite_grid(filename)
@@ -127,12 +129,12 @@ end
     @test getncells(grid) == 2
     @test getnnodes(grid) == 6
 end
-    
+
 @testset "sets" begin
     filename = gettestfile("generated_set.inp")
     grid = get_ferrite_grid(filename)
     @test getcellset(grid, "lower") == Set(1:8)
-    @test getnodeset(grid, "lower") == Set((1,  2,  3,  4,  7,  8,  9, 10, 11, 12, 13, 14, 20, 21, 22))
+    @test getnodeset(grid, "lower") == Set((1, 2, 3, 4, 7, 8, 9, 10, 11, 12, 13, 14, 20, 21, 22))
 
     filename = gettestfile("2D_UnitArea_Quadratic.inp")
     grid = get_ferrite_grid(filename)
@@ -140,10 +142,9 @@ end
 end
 
 
-
 @testset "custom_cells" begin
     filename = gettestfile("unsupported_element.inp")
-    grid = get_ferrite_grid(filename; user_elements=Dict("CUSTOM4CELL"=>Quadrilateral))
+    grid = get_ferrite_grid(filename; user_elements = Dict("CUSTOM4CELL" => Quadrilateral))
     @test getcellset(grid, "CUSTOM4CELL") == Set((1,))
     @test isa(getcells(grid)[1], Quadrilateral)
 end
@@ -151,8 +152,8 @@ end
 @testset "specify_file_type" begin
     filename = gettestfile("2D_UnitArea_Quadratic.inp")
     filename_cp = joinpath(@__DIR__, "tmp.txt")
-    cp(filename, filename_cp; force=true)
-    grid_cp = get_ferrite_grid(filename_cp; meshformat=FerriteMeshParser.AbaqusMeshFormat())
+    cp(filename, filename_cp; force = true)
+    grid_cp = get_ferrite_grid(filename_cp; meshformat = FerriteMeshParser.AbaqusMeshFormat())
     grid = get_ferrite_grid(filename)
     @test grid_cp == grid
     rm(filename_cp)
