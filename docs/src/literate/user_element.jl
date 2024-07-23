@@ -7,7 +7,7 @@
 # 
 # For this element, it can be defined as a specific `Ferrite.Cell` type
 using Ferrite, FerriteMeshParser
-LinearWedge = Ferrite.Cell{3,6,5}
+LinearWedge = Ferrite.Cell{3, 6, 5}
 
 # For this element to work with Ferrite, one must define a new reference shape
 # e.g. Wedge and the appropriate interpolations for this shape. In doing so, 
@@ -15,14 +15,14 @@ LinearWedge = Ferrite.Cell{3,6,5}
 # the node order should be the same as in Abaqus as shown above. To change this,
 # it is possible to overload the function `FerriteMeshParser.create_cell` as follows
 
-create_cell(::Type{LinearWedge}, node_numbers, ::FerriteMeshParser.AbaqusMeshFormat) = LinearWedge(ntuple(j->node_numbers[j], length(node_numbers)))
+create_cell(::Type{LinearWedge}, node_numbers, ::FerriteMeshParser.AbaqusMeshFormat) = LinearWedge(ntuple(j -> node_numbers[j], length(node_numbers)))
 
 # This setup allows changing the node order for your specific element. 
 # It is also possible to use another type which is not a variant of `Ferrite.Cell`, but 
 # rather a subtype of `Ferrite.AbstractCell`. After these modifications, one can import 
 # the mesh by specifying that the Abaqus code `C3D6` should be interpreted as a `LinearWedge`:
 
-grid = get_ferrite_grid("wedge_element.inp"; user_elements=Dict("C3D6"=>LinearWedge));
+grid = get_ferrite_grid("wedge_element.inp"; user_elements = Dict("C3D6" => LinearWedge));
 
 # Giving the following grid
 println(typeof(grid))
@@ -37,4 +37,3 @@ println(unique(typeof.(getcells(grid))))    # The different cell types in the gr
 #md # ```julia
 #md # @__CODE__
 #md # ```
-

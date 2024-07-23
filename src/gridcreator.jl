@@ -4,14 +4,14 @@ function create_grid(mesh::RawMesh, format, user_elements)
     nodes = create_nodes(getnodes(mesh), Val(dim))
     cellsets = create_cellsets(getelementsdicts(mesh), getelementsets(mesh))
     nodesets = create_nodesets(Ferrite.getnodesets(mesh))
-    return Grid(cells, nodes; cellsets=cellsets, nodesets=nodesets)
+    return Grid(cells, nodes; cellsets = cellsets, nodesets = nodesets)
 end
 
-function create_nodes(rawnodes::RawNodes, ::Val{dim}) where{dim}
+function create_nodes(rawnodes::RawNodes, ::Val{dim}) where {dim}
     num = getnumnodes(rawnodes)
-    nodes=Array{Node{dim, Float64}}(undef, num)
+    nodes = Array{Node{dim, Float64}}(undef, num)
     for (index, node_number) in enumerate(getnumbers(rawnodes))
-        x=Vec{dim}(getcoordinate(rawnodes, index))
+        x = Vec{dim}(getcoordinate(rawnodes, index))
         nodes[node_number] = Node(x)
     end
     return nodes

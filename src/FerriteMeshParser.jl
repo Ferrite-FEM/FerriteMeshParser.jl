@@ -1,5 +1,5 @@
 module FerriteMeshParser
-using Ferrite: 
+using Ferrite:
     Ferrite, Grid, Node, Vec,
     getcells, getnodes, getcoordinates, getncells
 
@@ -27,8 +27,8 @@ end
 Base.showerror(io::IO, e::InvalidFileContent) = println(io, e.msg)
 
 @static if !isdefined(Ferrite, :SerendipityQuadraticHexahedron)
-    const SerendipityQuadraticHexahedron = Ferrite.Cell{3,20,6}
-    const SerendipityQuadraticQuadrilateral = Ferrite.Cell{2,8,4}
+    const SerendipityQuadraticHexahedron = Ferrite.Cell{3, 20, 6}
+    const SerendipityQuadraticQuadrilateral = Ferrite.Cell{2, 8, 4}
 else
     const SerendipityQuadraticHexahedron = Ferrite.SerendipityQuadraticHexahedron
     const SerendipityQuadraticQuadrilateral = Ferrite.SerendipityQuadraticQuadrilateral
@@ -36,13 +36,13 @@ end
 
 const FacetsDefined = isdefined(Ferrite, :FacetIndex) # Ferrite after v1.0 (Ferrite#914)
 
-const FacetIndex   = FacetsDefined ? Ferrite.FacetIndex   : Ferrite.FaceIndex
-const facets       = FacetsDefined ? Ferrite.facets       : Ferrite.faces
+const FacetIndex = FacetsDefined ? Ferrite.FacetIndex : Ferrite.FaceIndex
+const facets = FacetsDefined ? Ferrite.facets : Ferrite.faces
 const addfacetset! = FacetsDefined ? Ferrite.addfacetset! : Ferrite.addfaceset!
 
 include("rawmesh.jl")
 include("elements.jl")
-include("reading_utils.jl") 
+include("reading_utils.jl")
 include("abaqusreader.jl")
 include("gridcreator.jl")
 
@@ -64,7 +64,7 @@ Optional arguments:
 * `generate_facetsets`: Should facesets be automatically generated from all nodesets?
 
 """
-function get_ferrite_grid(filename; meshformat=AutomaticMeshFormat(), user_elements::Dict{String, DataType}=Dict{String, DataType}(), generate_facetsets::Bool=true, generate_facesets=nothing)
+function get_ferrite_grid(filename; meshformat = AutomaticMeshFormat(), user_elements::Dict{String, DataType} = Dict{String, DataType}(), generate_facetsets::Bool = true, generate_facesets = nothing)
     generate_facesets !== nothing && error("The keyword generate_facesets is deprecated, use generate_facetsets instead")
     detected_format = detect_mesh_format(filename, meshformat)
     mesh = read_mesh(filename, detected_format)
@@ -88,11 +88,11 @@ Otherwise the search is over all cells.
 This function is normally only required when calling `get_ferrite_grid` with `generate_facetsets=false`. 
 The created `facetset` can be added to the grid as `addfacetset!(grid, "facetsetkey", facetset)`
 """
-function create_facetset(grid::Ferrite.AbstractGrid, nodeset::AbstractSet{Int}, cellset=1:getncells(grid))
+function create_facetset(grid::Ferrite.AbstractGrid, nodeset::AbstractSet{Int}, cellset = 1:getncells(grid))
     facetset = sizehint!(Set{FacetIndex}(), length(nodeset))
     for (cellid, cell) in enumerate(getcells(grid))
         cellid ∈ cellset || continue
-        if any(n-> n ∈ nodeset, cell.nodes)
+        if any(n -> n ∈ nodeset, cell.nodes)
             for (facetid, facet) in enumerate(facets(cell))
                 if all(n -> n ∈ nodeset, facet)
                     push!(facetset, FacetIndex(cellid, facetid))
