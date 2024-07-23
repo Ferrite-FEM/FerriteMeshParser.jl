@@ -18,9 +18,9 @@ end
 # stopsign encountered. Buffer at beginning of stopsign
 function readlinesuntil(f; stopsign)
     # Split lines for both Windows and Linux line endings
-    data = strip.(split(readuntil(f, stopsign; keep=false), r"\r\n|\n"))
+    data = strip.(split(readuntil(f, stopsign; keep = false), r"\r\n|\n"))
     # Set buffer to the beginning of the stopsign
-    seek(f, position(f) - length(stopsign))                      
+    seek(f, position(f) - length(stopsign))
     return data
 end
 

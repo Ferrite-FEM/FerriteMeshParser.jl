@@ -9,7 +9,7 @@ mkpath(GENERATEDDIR)
 supplementary_fileextensions = [".inp", ".svg", ".png", ".jpg", ".gif"]
 for example in readdir(EXAMPLEDIR)
     if any(endswith.(example, supplementary_fileextensions))
-        cp(joinpath(EXAMPLEDIR, example), joinpath(GENERATEDDIR, example); force=true)
+        cp(joinpath(EXAMPLEDIR, example), joinpath(GENERATEDDIR, example); force = true)
     end
 end
 
@@ -21,7 +21,7 @@ for example in readdir(EXAMPLEDIR)
 
         # remove "hidden" lines which are not shown in the markdown
         line_ending_symbol = occursin(code, "\r\n") ? "\r\n" : "\n"
-        code_clean = join(filter(x->!endswith(x,"#hide"),split(code, r"\n|\r\n")), line_ending_symbol)
+        code_clean = join(filter(x -> !endswith(x, "#hide"), split(code, r"\n|\r\n")), line_ending_symbol)
 
         mdpost(str) = replace(str, "@__CODE__" => code_clean)
         Literate.markdown(input, GENERATEDDIR, postprocess = mdpost)
