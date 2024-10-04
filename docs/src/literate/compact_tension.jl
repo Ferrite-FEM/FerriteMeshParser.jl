@@ -37,7 +37,7 @@ println([(key, length(set)) for (key, set) in Ferrite.getfacesets(grid)])
 # Clearly, the facetset `"CrackZone"` doesn't make much sense, but unless the mesh is 
 # very large it doesn't hurt. The facetsets can be created manually from each nodeset
 # by using the `create_facetset` function: 
-facetset = create_facetset(grid, getnodeset(grid,"Hole"));
+facetset = create_facetset(grid, getnodeset(grid, "Hole"));
 # This can, if desired, be merged into the grid by
 # ```julia
 # addfaceset!(grid, "HoleManual", facetset)
@@ -52,4 +52,3 @@ facetset = create_facetset(grid, getnodeset(grid,"Hole"));
 #md # ```julia
 #md # @__CODE__
 #md # ```
-
