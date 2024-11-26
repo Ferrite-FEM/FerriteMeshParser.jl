@@ -5,7 +5,7 @@ struct RawElements
     numbers::Vector{Int}
     topology::Matrix{Int}
 end
-RawElements(;numbers, topology) = RawElements(numbers, topology)
+RawElements(; numbers, topology) = RawElements(numbers, topology)
 
 getnumbers(elements::RawElements) = elements.numbers
 gettopology(elements::RawElements) = elements.topology
@@ -17,14 +17,14 @@ struct RawNodes
     numbers::Vector{Int}
     coordinates::Matrix{Float64}
 end
-RawNodes(;numbers, coordinates) = RawNodes(numbers, coordinates) 
+RawNodes(; numbers, coordinates) = RawNodes(numbers, coordinates)
 
 getnumbers(nodes::RawNodes) = nodes.numbers
 Ferrite.getcoordinates(nodes::RawNodes) = nodes.coordinates
 
 getnumnodes(nodes::RawNodes) = length(getnumbers(nodes))
-getdim(nodes::RawNodes) = size(getcoordinates(nodes),1)
-getcoordinate(nodes::RawNodes, number) = getcoordinates(nodes)[:,number]
+getdim(nodes::RawNodes) = size(getcoordinates(nodes), 1)
+getcoordinate(nodes::RawNodes, number) = getcoordinates(nodes)[:, number]
 
 # Complete mesh
 struct RawMesh
@@ -33,7 +33,7 @@ struct RawMesh
     elementsets::Dict{String, Vector{Int}}
     nodesets::Dict{String, Vector{Int}}
 end
-RawMesh(;elements,nodes,elementsets,nodesets) = RawMesh(elements,nodes,elementsets,nodesets)
+RawMesh(; elements, nodes, elementsets, nodesets) = RawMesh(elements, nodes, elementsets, nodesets)
 
 Ferrite.getnodes(mesh::RawMesh) = mesh.nodes
 getelementsdicts(mesh::RawMesh) = mesh.elementsdicts
