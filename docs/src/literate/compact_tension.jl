@@ -33,14 +33,14 @@ println([(key, length(set)) for (key, set) in Ferrite.getcellsets(grid)])
 # in only part of the domain and want to have this in Ferrite). Finally, facetsets are 
 # automatically created by default (can be turned off by `generate_facetsets=false` 
 # argument) based on the nodesets:
-println([(key, length(set)) for (key, set) in Ferrite.getfacesets(grid)])
+println([(key, length(set)) for (key, set) in Ferrite.getfacetsets(grid)])
 # Clearly, the facetset `"CrackZone"` doesn't make much sense, but unless the mesh is 
 # very large it doesn't hurt. The facetsets can be created manually from each nodeset
 # by using the `create_facetset` function: 
 facetset = create_facetset(grid, getnodeset(grid,"Hole"));
 # This can, if desired, be merged into the grid by
 # ```julia
-# addfaceset!(grid, "HoleManual", facetset)
+# addfacetset!(grid, "HoleManual", facetset)
 # ```
 
 # 
