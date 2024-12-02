@@ -8,7 +8,7 @@ println(unique(typeof.(getcells(grid))))    # The different cell types in the gr
 println([(key, length(set)) for (key, set) in Ferrite.getnodesets(grid)])
 println([(key, length(set)) for (key, set) in Ferrite.getcellsets(grid)])
 
-println([(key, length(set)) for (key, set) in Ferrite.getfacesets(grid)])
+println([(key, length(set)) for (key, set) in Ferrite.getfacetsets(grid)])
 
 facetset = create_facetset(grid, getnodeset(grid,"Hole"));
 

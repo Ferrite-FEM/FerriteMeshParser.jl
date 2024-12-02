@@ -1,9 +1,8 @@
 using Ferrite, FerriteMeshParser
-LinearWedge = Ferrite.Cell{3,6,5}
 
-create_cell(::Type{LinearWedge}, node_numbers, ::FerriteMeshParser.AbaqusMeshFormat) = LinearWedge(ntuple(j->node_numbers[j], length(node_numbers)))
+create_cell(::Type{Wedge}, node_numbers, ::FerriteMeshParser.AbaqusMeshFormat) = Wedge(ntuple(j->node_numbers[j], length(node_numbers)))
 
-grid = get_ferrite_grid("wedge_element.inp"; user_elements=Dict("C3D6"=>LinearWedge));
+grid = get_ferrite_grid("wedge_element.inp"; user_elements=Dict("C3D6"=>Wedge));
 
 println(typeof(grid))
 println(unique(typeof.(getcells(grid))))    # The different cell types in the grid
