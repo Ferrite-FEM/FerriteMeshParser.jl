@@ -72,9 +72,9 @@ end
 @testset "facet set generation" begin
     filename = gettestfile("compact_tension.inp")
     grid = get_ferrite_grid(filename)
-    face_set = create_facetset(grid, getnodeset(grid, "Hole"))
-    @test getfacetset(grid, "Hole") == face_set
-    @test face_set == create_facetset(grid, getnodeset(grid, "Hole"), getcellset(grid, "Hole"))    # Test that including cells doesn't change the created sets
+    face_set = create_facetset(grid, getnodeset(grid, "HOLE"))
+    @test getfacetset(grid, "HOLE") == face_set
+    @test face_set == create_facetset(grid, getnodeset(grid, "HOLE"), getcellset(grid, "HOLE"))    # Test that including cells doesn't change the created sets
 end
 
 @testset "exceptions" begin
@@ -100,7 +100,7 @@ end
     @test contains(String(take!(io)), test_string)
 
     grid = get_ferrite_grid(gettestfile("compact_tension.inp"))
-    nset = getnodeset(grid, "Hole")
+    nset = getnodeset(grid, "HOLE")
     @test_throws ErrorException("create_faceset is no longer supported, use create_facetset instead") create_faceset(grid, nset)
 end
 
@@ -131,12 +131,12 @@ end
 @testset "sets" begin
     filename = gettestfile("generated_set.inp")
     grid = get_ferrite_grid(filename)
-    @test getcellset(grid, "lower") == Set(1:8)
-    @test getnodeset(grid, "lower") == Set((1,  2,  3,  4,  7,  8,  9, 10, 11, 12, 13, 14, 20, 21, 22))
+    @test getcellset(grid, "LOWER") == Set(1:8)
+    @test getnodeset(grid, "LOWER") == Set((1,  2,  3,  4,  7,  8,  9, 10, 11, 12, 13, 14, 20, 21, 22))
 
     filename = gettestfile("2D_UnitArea_Quadratic.inp")
     grid = get_ferrite_grid(filename)
-    @test getcellset(grid, "mysetname") == Set((1,))
+    @test getcellset(grid, "MYSETNAME") == Set((1,))
 end
 
 
