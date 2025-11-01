@@ -3,6 +3,9 @@ using Ferrite:
     Ferrite, Grid, Node, Vec,
     getcells, getnodes, getcoordinates, getncells
 
+using OrderedCollections:
+    LittleDict
+
 # Convenience when debugging
 const DEBUG_PARSE = false
 
