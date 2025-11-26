@@ -5,9 +5,10 @@ using Random
 using Test
 using Aqua
 
-Aqua.test_all(FerriteMeshParser; ambiguities = false)
+Aqua.test_all(FerriteMeshParser; ambiguities = false, project_toml_formatting = false)
+# project_toml_formatting fails when running Downstream testing from Ferrite, but not so important...
 Aqua.test_ambiguities(FerriteMeshParser)    # This excludes Core and Base, which gets many ambiguities with ForwardDiff
- 
+
 # Function to retrieve test fields
 gettestfile(args...) = joinpath(@__DIR__, "test_files", args...)
 
